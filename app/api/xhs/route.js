@@ -59,7 +59,6 @@ export async function GET(request) {
   }
 
   const content = await zip.generateAsync({ type: "blob" });
-
   const headers = new Headers();
   headers.append("Content-Disposition", 'attachment; filename="zipname.zip"');
   headers.append("Content-Type", "application/zip");

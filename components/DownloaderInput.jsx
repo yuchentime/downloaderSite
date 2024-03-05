@@ -11,7 +11,7 @@ const DownloaderInput = () => {
     setTimeout(() => {
       setDownloadFailed(false);
     }, 2000);
-  }, [downloadFailed])
+  }, [downloadFailed]);
 
   const handleClick = async () => {
     if (isLoading || !targetUrls) {
@@ -33,7 +33,7 @@ const DownloaderInput = () => {
 
     const response = await fetch(`/api/xhs?url=${JSON.stringify(urls)}`);
     if (response.ok) {
-      const zipfilename = matchZipTile(urls);
+      const zipfilename = matchZipTile(targetUrls);
       console.log("zipfilename: ", zipfilename);
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
@@ -48,10 +48,16 @@ const DownloaderInput = () => {
   };
 
   const matchZipTile = (str) => {
-    const regex = /【(.*?)】/; // 匹配【】内的内容，非贪婪模式
-    const match = str.match(regex);
+    const pattern = /【(.*?)】/;
+    const match = str.match(pattern);
     if (match) {
-      return match[1];
+      const originalTitle = String(match[1]);
+      return originalTitle.substring(
+        0,
+        originalTitle.lastIndexOf(" | ") !== -1
+          ? originalTitle.lastIndexOf(" | ")
+          : originalTitle.length - 1
+      );
     } else {
       return generateRandomString(15);
     }
@@ -60,7 +66,11 @@ const DownloaderInput = () => {
   const extractUrl = (originUrl) => {
     const regex = /((https?:\/\/)[\S]+)/;
     var matches = originUrl.match(regex);
-    if (matches && matches.length > 1 && String(matches[1]).startsWith("http://xhslink.com")) {
+    if (
+      matches &&
+      matches.length > 1 &&
+      String(matches[1]).startsWith("http://xhslink.com")
+    ) {
       return matches[1];
     } else {
       return null;
@@ -69,22 +79,27 @@ const DownloaderInput = () => {
 
   return (
     <>
-     {downloadFailed && <div role="alert" className="alert alert-warning w-1/5 mx-auto fixed top-10 left-1/2">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="stroke-current shrink-0 h-6 w-6"
-          fill="none"
-          viewBox="0 0 24 24"
+      {downloadFailed && (
+        <div
+          role="alert"
+          className="alert alert-warning w-1/5 mx-auto fixed top-10 left-1/2"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-          />
-        </svg>
-        <span>下载失败!</span>
-      </div>}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="stroke-current shrink-0 h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+            />
+          </svg>
+          <span>下载失败!</span>
+        </div>
+      )}
       <div className="relative">
         <div className="w-1/2 mx-auto flex justify-center items-center mt-16">
           <input

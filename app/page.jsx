@@ -28,8 +28,7 @@ export default function Home() {
             小红书笔记下载
           </h1>
           <p className=" text-white text-sm">
-            将笔记内的图片、视频和文本以 <b>zip压缩包</b>{" "}
-            的形式打包下载。无需手动格式链接，直接将复制下来的分享链接粘贴进去即可。
+            小红书视频图片下载，同时支持提取图片内文本，最后以<b>zip压缩包</b>形式打包下载
           </p>
         </div>
         <DownloaderInput />
