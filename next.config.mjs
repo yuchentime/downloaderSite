@@ -8,8 +8,7 @@ const nextConfig = {
     // Warning: This allows production builds to successfully complete even if
     // your project has ESLint errors.
     ignoreDuringBuilds: true,
-  },
-  distDir: "vercel/output"
+  }
 };
 
 export default nextConfig;
