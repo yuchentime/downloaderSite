@@ -9,7 +9,7 @@ const nextConfig = {
     // your project has ESLint errors.
     ignoreDuringBuilds: true,
   },
-  // distDir: "vercel/output"
+  distDir: "vercel/output"
 };
 
 export default nextConfig;
