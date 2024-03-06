@@ -11,7 +11,10 @@ export async function GET(request) {
     console.error("url is null");
     return Response.status(500).error();
   }
+  console.log('ready to fetch node: ', Date.now());
   const note = await downloadNote(url);
+  console.log('finish to fetch node: ', Date.now());
+
   if (!note) {
     return Response.status(500).error();
   }
