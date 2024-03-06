@@ -1,8 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
-    // 如果依赖使用了node.js的功能，则需要将这些依赖从nextjs的server component中剔除掉，因为nextjs是运行在浏览器端
-    serverComponentsExternalPackages: ["tesseract.js", "tesseract.js-core"],
+    // 如果依赖了node.js特定功能的第三方依赖
+    serverComponentsExternalPackages: ["tesseract.js"],
+    // 
     outputFileTracingIncludes: {
       "/api/**/*": ["./node_modules/**/*.wasm", "./node_modules/**/*.proto"],
     },
