@@ -34,7 +34,6 @@ const DownloaderInput = () => {
     const response = await fetch(`/api/xhs?url=${JSON.stringify(urls)}`);
     if (response.ok) {
       const zipfilename = matchZipTile(targetUrls);
-      console.log("zipfilename: ", zipfilename);
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
       const downloadLink = document.createElement("a");
