@@ -1,10 +1,12 @@
 import DownloaderInput from "@/components/DownloaderInput";
 import XiaohongshuPage from "@/components/XHSInstructionsPage";
 import Image from "next/image";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export default function Home() {
   return (
     <>
+      <SpeedInsights />
       <div className="bg-gray-800 text-white">
         <div className="navbar w-1/2 mx-auto">
           <div className="navbar-start">
@@ -28,7 +30,8 @@ export default function Home() {
             小红书笔记下载
           </h1>
           <p className=" text-white text-sm">
-            小红书视频图片下载，同时支持提取图片内文本，最后以<b>zip压缩包</b>形式打包下载
+            小红书视频图片下载，同时支持提取图片内文本，最后以<b>zip压缩包</b>
+            形式打包下载
           </p>
         </div>
         <DownloaderInput />

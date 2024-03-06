@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@vercel/speed-insights": "^1.0.10",
     "axios": "^1.6.7",
     "bulma": "^0.9.4",
     "canvas": "^2.11.2",
