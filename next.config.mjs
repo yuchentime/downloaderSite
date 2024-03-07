@@ -13,6 +13,7 @@ const nextConfig = {
     // your project has ESLint errors.
     ignoreDuringBuilds: true,
   },
+  distdir: "output"
 };
 
 export default nextConfig;
