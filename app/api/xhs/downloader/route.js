@@ -19,7 +19,13 @@ export async function GET(request) {
 }
 
 const downloadNote = (noteUrl) => {
-  const targetUrl = CommonConstants.XHS_PROXY_URL.replace("%s", noteUrl);
+  let targetUrl = "";
+  if (process.env.NEXT_PUBLIC_XHS_PROXY_URL) {
+    targetUrl = process.env.NEXT_PUBLIC_XHS_PROXY_URL.replace("%s", noteUrl);
+  } else {
+    targetUrl = CommonConstants.XHS_PROXY_URL.replace("%s", noteUrl);
+  }
+  console.log('targetUrl: ', targetUrl)
   console.log("ready to fecth: ", targetUrl);
   return new Promise((resolve, reject) => {
     axios.get(targetUrl).then((response) => {
