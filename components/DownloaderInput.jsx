@@ -5,6 +5,7 @@ import { generateRandomString } from "@/utils/helper";
 const DownloaderInput = () => {
   const [targetUrls, setTargetUrls] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(false);
+  const [progressInfo, setProgressInfo] = React.useState("");
   const [downloadFailed, setDownloadFailed] = React.useState(false);
 
   React.useEffect(() => {
@@ -26,24 +27,50 @@ const DownloaderInput = () => {
     setIsLoading(true);
 
     setTimeout(() => {
-      console.log("下载超时");
       setIsLoading(false);
       setDownloadFailed(true);
-    }, 15000);
+    }, 30000);
 
-    const response = await fetch(`/api/xhs?url=${JSON.stringify(urls)}`);
-    if (response.ok) {
-      const zipfilename = matchZipTile(targetUrls);
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-      const downloadLink = document.createElement("a");
-      downloadLink.href = url;
-      downloadLink.download = zipfilename;
-      downloadLink.click();
-
-      setTargetUrls("");
+    setProgressInfo("正在抓取笔记...");
+    const noteResp = await fetch(
+      `/api/xhs/downloader?url=${JSON.stringify(urls)}`
+    );
+    setProgressInfo("noteResp: ", noteResp);
+    if (!noteResp.ok) {
       setIsLoading(false);
+      setDownloadFailed(true);
+      return;
     }
+    const noteJson = await noteResp.json();
+    if (!noteJson) {
+      setIsLoading(false);
+      setDownloadFailed(true);
+      return;
+    }
+    setProgressInfo("正在打包笔记...");
+    const packageResp = await fetch("/api/xhs/package", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(noteJson),
+    });
+    if (!packageResp.ok) {
+      setIsLoading(false);
+      setDownloadFailed(true);
+      return;
+    }
+    const zipfilename = matchZipTile(targetUrls);
+    const blob = await packageResp.blob();
+    const url = URL.createObjectURL(blob);
+    const downloadLink = document.createElement("a");
+    downloadLink.href = url;
+    downloadLink.download = zipfilename;
+    downloadLink.click();
+
+    setTargetUrls("");
+    setIsLoading(false);
+    setProgressInfo("");
   };
 
   const matchZipTile = (str) => {
@@ -117,7 +144,9 @@ const DownloaderInput = () => {
             {isLoading ? "下载中..." : "点击下载"}
           </button>
         </div>
-        <div className="w-1/2 mx-auto mt-16 flex justify-center"></div>
+        <div className="w-2/5 mx-auto mt-8 h-10 flex justify-center">
+          {isLoading && <div className="w-100 mx-auto h-10">{progressInfo}</div>}
+        </div>
       </div>
     </>
   );

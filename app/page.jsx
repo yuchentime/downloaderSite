@@ -10,8 +10,8 @@ export default function Home() {
       <div className="bg-gray-800 text-white">
         <div className="navbar w-1/2 mx-auto">
           <div className="navbar-start">
-            <Image src="/favicon.ico" width={24} height={24} className="mr-2" />
-            <a className="text-xl">在线资源下载器</a>
+            {/* <Image src="/favicon.ico" width={24} height={24} className="mr-2" /> */}
+            {/* <a className="text-xl">在线资源下载器</a> */}
           </div>
           {/* <div className="navbar-end hidden lg:flex">
         <ul className="menu menu-horizontal px-1 ">
@@ -30,7 +30,7 @@ export default function Home() {
             小红书笔记下载
           </h1>
           <p className=" text-white text-sm">
-            小红书视频图片下载，同时支持提取图片内文本，最后以<b>zip压缩包</b>
+            小红书视频图片下载，同时支持<span className="text-red-400">提取图片内文本</span>，最后以<b>zip压缩包</b>
             形式打包下载
           </p>
         </div>
