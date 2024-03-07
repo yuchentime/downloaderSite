@@ -67,7 +67,13 @@ export async function GET(request) {
 
 const downloadNote = (noteUrl) => {
   return new Promise((resolve, reject) => {
-    axios.get(noteUrl).then((response) => {
+    axios.get(noteUrl, {
+  headers: {
+    'Access-Control-Allow-Origin': 'https://www.xiaohongshu.com',
+    'Access-Control-Allow-Methods', 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers', 'Content-Type'
+  }
+}).then((response) => {
       if (!response || response.status !== 200) {
         resolve(null);
         return;
