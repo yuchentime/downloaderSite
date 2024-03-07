@@ -70,7 +70,7 @@ const proxy_url =
 const downloadNote = (noteUrl) => {
   const targetUrl = proxy_url.replace("%s", noteUrl);
   return new Promise((resolve, reject) => {
-    axios.get(targetUrl).then((response) => {
+    axios.get(noteUrl).then((response) => {
       if (!response || response.status !== 200) {
         resolve(null);
         return;
