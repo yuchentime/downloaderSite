@@ -69,8 +69,10 @@ const proxy_url =
   "https://xhs-proxy.yuchentime.workers.dev?url=%s&id=yuchentime";
 const downloadNote = (noteUrl) => {
   const targetUrl = proxy_url.replace("%s", noteUrl);
+  console.log("ready to fecth: ", targetUrl);
   return new Promise((resolve, reject) => {
     axios.get(targetUrl).then((response) => {
+      console.log("sccuess to fecth");
       if (!response || response.status !== 200) {
         resolve(null);
         return;
