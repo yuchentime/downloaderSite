@@ -65,9 +65,12 @@ export async function GET(request) {
   return new Response(content, { headers });
 }
 
+const proxy_url =
+  "https://xhs-proxy.yuchentime.workers.dev?url=%s&id=yuchentime";
 const downloadNote = (noteUrl) => {
+  const targetUrl = proxy_url.replace("%s", noteUrl);
   return new Promise((resolve, reject) => {
-    axios.get(noteUrl).then((response) => {
+    axios.get(targetUrl).then((response) => {
       if (!response || response.status !== 200) {
         resolve(null);
         return;
