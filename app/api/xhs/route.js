@@ -70,8 +70,8 @@ const downloadNote = (noteUrl) => {
     axios.get(noteUrl, {
   headers: {
     'Access-Control-Allow-Origin': 'https://www.xiaohongshu.com',
-    'Access-Control-Allow-Methods', 'GET, POST, OPTIONS',
-    'Access-Control-Allow-Headers', 'Content-Type'
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type'
   }
 }).then((response) => {
       if (!response || response.status !== 200) {
