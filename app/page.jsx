@@ -1,6 +1,5 @@
 import DownloaderInput from "@/components/DownloaderInput";
 import XiaohongshuPage from "@/components/XHSInstructionsPage";
-import Image from "next/image";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export default function Home() {
@@ -25,8 +24,8 @@ export default function Home() {
       </div> */}
         </div>
         <div className="divider w-1/2 mx-auto my-0"></div>
-        <div className="w-1/2 mx-auto mt-16 text-center">
-          <h1 className="text-3xl font-bold tracking-tight  text-white">
+        <div className="w-5/6 lg:w-1/2 mx-auto lg:mt-16 text-center">
+          <h1 className="lg:text-3xl font-bold tracking-tight text-white text-xl">
             小红书笔记下载
           </h1>
           <p className=" text-white text-sm">
@@ -36,7 +35,7 @@ export default function Home() {
         </div>
         <DownloaderInput />
       </div>
-      <div className="mt-24 border-solid border-stone-900">
+      <div className="mt-4 lg:mt-16 border-solid border-stone-900">
         <XiaohongshuPage />
       </div>
     </>
