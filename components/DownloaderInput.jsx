@@ -47,13 +47,28 @@ const DownloaderInput = () => {
       setDownloadFailed(true);
       return;
     }
+
+    let image2Text = undefined;
+    if (noteJson.imageUrls && noteJson.imageUrls.length > 0) {
+      setProgressInfo("正在提取图片文本...");
+      const imageTextResp = await fetch("/api/xhs/imagetext", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(noteJson),
+      });
+      if (imageTextResp.ok) {
+        image2Text = await imageTextResp.json();
+      }
+    }
     setProgressInfo("正在打包笔记...");
     const packageResp = await fetch("/api/xhs/package", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(noteJson),
+      body: JSON.stringify({...noteJson, ...image2Text}),
     });
     if (!packageResp.ok) {
       setIsLoading(false);
@@ -84,17 +99,14 @@ const DownloaderInput = () => {
           ? originalTitle.lastIndexOf(" | ")
           : originalTitle.length - 1
       );
-    } 
+    }
     return generateRandomString(15);
   };
 
   const extractUrl = (originUrl) => {
-    const regex = /http:\/\/xhslink\.com\/[a-zA-Z0-9]+/
+    const regex = /http:\/\/xhslink\.com\/[a-zA-Z0-9]+/;
     var matches = originUrl.match(regex);
-    if (
-      matches &&
-      matches.length > 0
-    ) {
+    if (matches && matches.length > 0) {
       return matches[0];
     } else {
       return null;

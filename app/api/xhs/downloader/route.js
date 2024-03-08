@@ -15,7 +15,7 @@ export async function GET(request) {
   }
   const headers = new Headers();
   headers.append("Content-Type", "application/json");
-  return new Response(JSON.stringify(note), { headers });
+  return Response.json(note)
 }
 
 const downloadNote = (noteUrl) => {
@@ -25,7 +25,6 @@ const downloadNote = (noteUrl) => {
   } else {
     targetUrl = CommonConstants.XHS_PROXY_URL.replace("%s", noteUrl);
   }
-  console.log('targetUrl: ', targetUrl)
   console.log("ready to fecth: ", targetUrl);
   return new Promise((resolve, reject) => {
     axios.get(targetUrl).then((response) => {

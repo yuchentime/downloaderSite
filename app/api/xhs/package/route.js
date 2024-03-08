@@ -1,7 +1,6 @@
 import * as CommonConstants from "@/constans/CommonConstant";
 import axios from "axios";
 import JSZip from "jszip";
-import { createScheduler, createWorker } from "tesseract.js";
 
 export async function POST(request) {
   if (!request.body) {
@@ -39,10 +38,10 @@ export async function POST(request) {
         zip.file(fileName + "." + CommonConstants.IMAGE_TYPE, value["data"]);
       }
     });
+  }
 
-    console.log("ready to extract text from images");
-    const imageText = await readTextFromImages(note.imageUrls);
-    zip.file("ImageText." + CommonConstants.TEXT_TYPE, imageText);
+  if (note.imageText) {
+    zip.file("ImageText." + CommonConstants.TEXT_TYPE, note.imageText);
   }
 
   console.log("ready to package videos");
@@ -64,29 +63,3 @@ export async function POST(request) {
   headers.append("Content-Type", "application/zip");
   return new Response(content, { headers });
 }
-
-const readTextFromImages = async (imageUrls) => {
-  if (!imageUrls) {
-    return null;
-  }
-
-  const scheduler = createScheduler();
-  // chi_tra指繁中
-  const worker1 = await createWorker(["eng", "chi_sim"]);
-  const worker2 = await createWorker(["eng", "chi_sim"]);
-  scheduler.addWorker(worker1);
-  scheduler.addWorker(worker2);
-  /** Add 10 recognition jobs */
-  const results = await Promise.all(
-    imageUrls.map((imageUrl) => scheduler.addJob("recognize", imageUrl))
-  );
-  await scheduler.terminate(); // It also terminates all workers.
-  if (!results) {
-    return null;
-  }
-  const texts = results.map((result) => {
-    return result.data?.text;
-  });
-  // 组合成单个字符串
-  return texts.join("\n\n");
-};
