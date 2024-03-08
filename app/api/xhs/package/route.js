@@ -11,10 +11,11 @@ export async function POST(request) {
   if (!note) {
     return Response.error();
   }
-
+  console.log("ready to package, note: ", note);
   const zip = new JSZip();
   zip.file(note.title + "." + CommonConstants.TEXT_TYPE, note.desc);
 
+  console.log("ready to package images");
   if (note.imageUrls && note.imageUrls.length > 0) {
     const imagePromises = await Promise.allSettled(
       note.imageUrls.map((url) => {
@@ -39,10 +40,12 @@ export async function POST(request) {
       }
     });
 
+    console.log("ready to extract text from images");
     const imageText = await readTextFromImages(note.imageUrls);
     zip.file("ImageText." + CommonConstants.TEXT_TYPE, imageText);
   }
 
+  console.log("ready to package videos");
   if (note.videoUrl) {
     const url = note.videoUrl;
     try {
@@ -54,6 +57,7 @@ export async function POST(request) {
     }
   }
 
+  console.log("success to package all of sources");
   const content = await zip.generateAsync({ type: "blob" });
   const headers = new Headers();
   headers.append("Content-Disposition", 'attachment; filename="zipname.zip"');
