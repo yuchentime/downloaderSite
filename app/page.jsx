@@ -29,8 +29,7 @@ export default function Home() {
             小红书笔记下载
           </h1>
           <p className=" text-white text-sm">
-            小红书视频图片下载，同时支持<span className="text-red-400">提取图片内文本</span>，最后以<b>zip压缩包</b>
-            形式打包下载
+            zip格式打包下载小红书视频、图片及文本
           </p>
         </div>
         <DownloaderInput />
