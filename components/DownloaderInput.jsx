@@ -48,27 +48,28 @@ const DownloaderInput = () => {
       return;
     }
 
-    let image2Text = undefined;
-    if (noteJson.imageUrls && noteJson.imageUrls.length > 0) {
-      setProgressInfo("正在提取图片文本...");
-      const imageTextResp = await fetch("/api/xhs/imagetext", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(noteJson),
-      });
-      if (imageTextResp.ok) {
-        image2Text = await imageTextResp.json();
-      }
-    }
+    // let image2Text = undefined;
+    // if (noteJson.imageUrls && noteJson.imageUrls.length > 0) {
+    //   setProgressInfo("正在提取图片文本...");
+    //   const imageTextResp = await fetch("/api/xhs/imagetext", {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //     body: JSON.stringify(noteJson),
+    //   });
+    //   if (imageTextResp.ok) {
+    //     image2Text = await imageTextResp.json();
+    //   }
+    // }
+
     setProgressInfo("正在打包笔记...");
     const packageResp = await fetch("/api/xhs/package", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({...noteJson, ...image2Text}),
+      body: JSON.stringify(noteJson),
     });
     if (!packageResp.ok) {
       setIsLoading(false);

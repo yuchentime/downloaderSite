@@ -40,9 +40,9 @@ export async function POST(request) {
     });
   }
 
-  if (note.imageText) {
-    zip.file("ImageText." + CommonConstants.TEXT_TYPE, note.imageText);
-  }
+  // if (note.imageText) {
+  //   zip.file("ImageText." + CommonConstants.TEXT_TYPE, note.imageText);
+  // }
 
   console.log("ready to package videos");
   if (note.videoUrl) {
