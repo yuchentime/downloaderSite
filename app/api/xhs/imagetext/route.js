@@ -21,10 +21,6 @@ const readTextFromImages = async (imageUrls) => {
   if (!imageUrls) {
     return null;
   }
-  const proxyImageUrls = imageUrls.map((url) => {
-    return urlUtil.replaceUrlWithProxy(url);
-  })
-  console.log("proxyImageUrls: ", proxyImageUrls);
 
   const scheduler = createScheduler();
   // chi_tra指繁中
@@ -34,14 +30,14 @@ const readTextFromImages = async (imageUrls) => {
   scheduler.addWorker(worker2);
   /** Add 10 recognition jobs */
   const results = await Promise.all(
-    proxyImageUrls.map((proxyImageUrls) => scheduler.addJob("recognize", proxyImageUrls))
+    imageUrls.map((imageUrl) => scheduler.addJob("recognize", imageUrl))
   );
   await scheduler.terminate(); // It also terminates all workers.
   if (!results) {
     return null;
   }
   const texts = results.map((result) => {
-    return result.data?.text + "\n\r";
+    return result.data?.text;
   });
   // 组合成单个字符串
   return texts.join("\n\n");
