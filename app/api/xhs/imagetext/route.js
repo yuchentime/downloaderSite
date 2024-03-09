@@ -28,15 +28,20 @@ const readTextFromImages = async (imageUrls) => {
   scheduler.addWorker(worker1);
   scheduler.addWorker(worker2);
   /** Add 10 recognition jobs */
-  const results = await Promise.all(
+  const imageTextPromises = await Promise.allSettled(
     imageUrls.map((imageUrl) => scheduler.addJob("recognize", imageUrl))
   );
   await scheduler.terminate(); // It also terminates all workers.
-  if (!results) {
-    return null;
-  }
-  const texts = results.map((result) => {
-    return result.data?.text + "\n\r";
+  const texts = [];
+  imageTextPromises.forEach((res) => {
+    if (res["status"] === "fulfilled") {
+      const result = res["value"];
+      Object.keys(result).forEach((key) => {
+        console.log("result.data: ", result.data?.text);
+      })
+      const text = result.data?.text;
+      texts.push(text + "\n\r\t");
+    }
   });
   // 组合成单个字符串
   return texts.join("\n\n");
