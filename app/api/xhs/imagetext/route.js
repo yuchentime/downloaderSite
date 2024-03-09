@@ -1,5 +1,4 @@
 import { createScheduler, createWorker } from "tesseract.js";
-import * as urlUtil from "@/utils/url";
 
 export async function POST(request) {
   if (!request.body) {
@@ -21,10 +20,6 @@ const readTextFromImages = async (imageUrls) => {
   if (!imageUrls) {
     return null;
   }
-  const proxyImageUrls = imageUrls.map((url) => {
-    return urlUtil.replaceUrlWithProxy(url);
-  })
-  console.log("proxyImageUrls: ", imageUrls);
 
   const scheduler = createScheduler();
   // chi_tra指繁中
@@ -34,7 +29,7 @@ const readTextFromImages = async (imageUrls) => {
   scheduler.addWorker(worker2);
   /** Add 10 recognition jobs */
   const results = await Promise.all(
-    proxyImageUrls.map((imageUrl) => scheduler.addJob("recognize", imageUrl))
+    imageUrls.map((imageUrl) => scheduler.addJob("recognize", imageUrl))
   );
   await scheduler.terminate(); // It also terminates all workers.
   if (!results) {
