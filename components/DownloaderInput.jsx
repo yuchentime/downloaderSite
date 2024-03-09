@@ -1,22 +1,29 @@
 "use client";
 import { extractTitleFromUrl, extractUrl } from "@/utils/helper";
 import * as React from "react";
+import * as Icons from "./Icons";
 
 const DownloaderInput = () => {
   const [targetUrls, setTargetUrls] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(false);
   const [progressInfo, setProgressInfo] = React.useState("");
-  const [downloadFailed, setDownloadFailed] = React.useState(false);
   const [imageText, setImageText] = React.useState("");
   const [note, setNote] = React.useState(null);
+  const [alertInfo, setAlertInfo] = React.useState({
+    show: false,
+    type: "alert-warning",
+    msg: "",
+  });
 
   React.useEffect(() => {
-    if (!downloadFailed) {
-      setTimeout(() => {
-        setDownloadFailed(false);
-      }, 2000);
-    }
-  }, [downloadFailed]);
+    setTimeout(() => {
+      setAlertInfo({
+        show: false,
+        type: "alert",
+        msg: "",
+      });
+    }, 2000);
+  }, [alertInfo]);
 
   const handleDownload = async () => {
     if (isLoading || !targetUrls) {
@@ -44,8 +51,7 @@ const DownloaderInput = () => {
       body: JSON.stringify(noteJson),
     });
     if (!packageResp.ok) {
-      setIsLoading(false);
-      setDownloadFailed(true);
+      failed();
       return;
     }
     const zipfilename = extractTitleFromUrl(targetUrls);
@@ -118,22 +124,36 @@ const DownloaderInput = () => {
   const failed = () => {
     setProgressInfo("");
     setIsLoading(false);
-    setDownloadFailed(true);
+    setAlertInfo({
+      show: true,
+      type: "alert-warning",
+      msg: "下载失败, 请重试",
+    });
   };
 
   const success = () => {
     setTargetUrls("");
     setProgressInfo("");
     setIsLoading(false);
-    setDownloadFailed(false);
+    setAlertInfo({
+      show: false,
+      type: "alert-warning",
+      msg: "",
+    });
+  };
+
+  const copyToChipboard = () => {
+    if (imageText) {
+      navigator.clipboard.writeText(imageText);
+    }
   };
 
   return (
     <>
-      {downloadFailed && (
+      {alertInfo.show && (
         <div
           role="alert"
-          className="alert alert-warning w-1/5 mx-auto fixed top-10 left-1/2"
+          className={`alert w-1/2 lg:w-1/5 mx-auto fixed top-10 left-1/2 ${alertInfo.type}`}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -148,7 +168,7 @@ const DownloaderInput = () => {
               d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
             />
           </svg>
-          <span>下载失败!</span>
+          <span>{alertInfo.msg}</span>
         </div>
       )}
       <div>
@@ -158,22 +178,24 @@ const DownloaderInput = () => {
             required
             type="text"
             placeholder="输入笔记分享链接"
-            className="input input-bordered input-success w-5/6 mx-auto flex  lg:w-full h-14 text-black"
+            className="input input-bordered input-success w-5/6 mx-auto flex lg:w-full h-14 text-black"
             onChange={(e) => setTargetUrls(e.target.value)}
           />
-          <button
-            type="button"
-            onClick={handleDownload}
-            className="mt-4 mx-auto flex btn btn-success lg:mt-0 lg:ml-8 lg:h-14 w-40 lg:text-xl text-white"
-          >
-            点击下载
-          </button>
-          <button
-            className="btn btn-link text-pink-400"
-            onClick={handleImageText}
-          >
-            提取图片中文本
-          </button>
+          <div className="flex justify-center mt-4 lg:mt-0 lg:ml-16 lg:mx-auto">
+            <button
+              type="button"
+              onClick={handleDownload}
+              className="btn btn-success lg:h-14 w-40 lg:text-xl text-white "
+            >
+              点击下载
+            </button>
+            <button
+              className="btn btn-link text-pink-400"
+              onClick={handleImageText}
+            >
+              提取图片中文本
+            </button>
+          </div>
         </div>
         <div className="w-2/5 mx-auto mt-4 h-10 flex justify-center">
           {isLoading && (
@@ -184,11 +206,24 @@ const DownloaderInput = () => {
 
       <dialog id="image_text_modal" className="modal">
         <div className="modal-box">
-          <p className="py-4 text-black">{imageText}</p>
+          <form method="dialog">
+            <button
+              className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 text-black"
+              onClick={() => setImageText("")}
+            >
+              ✕
+            </button>
+          </form>
+          <p className="py-4 text-black">
+            {imageText ? imageText : <i>没有提取到任何内容</i>}
+          </p>
+          <button
+            className="btn btn-sm btn-circle btn-ghost absolute right-2 bottom-2 text-black"
+            onClick={copyToChipboard}
+          >
+            {Icons.OuiCopy()}
+          </button>
         </div>
-        <form method="dialog" className="modal-backdrop">
-          <button>close</button>
-        </form>
       </dialog>
     </>
   );
