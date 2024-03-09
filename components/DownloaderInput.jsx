@@ -165,12 +165,12 @@ const DownloaderInput = () => {
             >
               点击下载
             </button>
-            <button
+            {/* <button
               className="btn btn-link text-pink-400"
               onClick={handleImageText}
             >
               提取图片中文本
-            </button>
+            </button> */}
           </div>
         </div>
         <div className="w-2/5 mx-auto mt-4 h-10 flex justify-center">
