@@ -9,19 +9,13 @@ export default function Home() {
       <div className="bg-gray-800 text-white">
         <div className="navbar w-1/2 mx-auto">
           <div className="navbar-start">
-            {/* <Image src="/favicon.ico" width={24} height={24} className="mr-2" /> */}
-            {/* <a className="text-xl">在线资源下载器</a> */}
           </div>
-          {/* <div className="navbar-end hidden lg:flex">
-        <ul className="menu menu-horizontal px-1 ">
-          <li>
-            <a>小红书</a>
-          </li>
-          <li>
-            <a>抖音</a>
-          </li>
-        </ul>
-      </div> */}
+          <div className="navbar-end hidden lg:flex text-sm">
+            友链：
+            <a target="_blank" href="https://www.itdoc666.com/" className="text-white cursor-pointer">
+              知识充电站-专业的资料分享平台
+            </a>
+          </div>
         </div>
         <div className="divider w-1/2 mx-auto my-0"></div>
         <div className="w-5/6 lg:w-1/2 mx-auto lg:mt-16 text-center">
