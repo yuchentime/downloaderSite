@@ -1,30 +1,21 @@
 "use client";
 import { extractTitleFromUrl, extractUrl } from "@/utils/helper";
 import * as React from "react";
-import * as Icons from "./Icons";
+import ImageTextModal from "./ImageTextModal";
+const CustomAlertByLazy = React.lazy(() => import("./CustomAlert"));
 
 const DownloaderInput = () => {
   const [targetUrls, setTargetUrls] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(false);
   const [progressInfo, setProgressInfo] = React.useState("");
   const [imageText, setImageText] = React.useState("");
+  const imageTextModalRef = React.useRef(null);
   const [note, setNote] = React.useState(null);
   const [alertInfo, setAlertInfo] = React.useState({
     show: false,
     type: "alert-warning",
     msg: "",
   });
-
-  React.useEffect(() => {
-    setTimeout(() => {
-      setAlertInfo({
-        show: false,
-        type: "alert",
-        msg: "",
-      });
-    }, 2000);
-  }, [alertInfo]);
-
   const handleDownload = async () => {
     if (isLoading || !targetUrls) {
       return;
@@ -76,14 +67,11 @@ const DownloaderInput = () => {
     }
     setIsLoading(true);
 
-    console.log("urls: ", urls);
     const noteJson = await fetchNote(urls);
     if (!noteJson) {
       failed();
       return;
     }
-
-    console.log("noteJson: ", noteJson);
 
     if (noteJson.imageUrls && noteJson.imageUrls.length > 0) {
       setProgressInfo("正在提取图片文本...");
@@ -96,11 +84,12 @@ const DownloaderInput = () => {
       });
       if (imageTextResp.ok) {
         const imageTextJson = await imageTextResp.json();
-        console.log("imageTextJson.data: ", imageTextJson.data);
         setImageText(imageTextJson.data);
       }
     }
-    document.getElementById("image_text_modal").showModal();
+    if (imageTextModalRef?.current) {
+      imageTextModalRef.current.showModal();
+    }
 
     success();
   };
@@ -133,6 +122,13 @@ const DownloaderInput = () => {
       type: "alert-warning",
       msg: "下载失败, 请重试",
     });
+    setTimeout(() => {
+      setAlertInfo({
+        show: false,
+        type: "alert-warning",
+        msg: "",
+      });
+    }, 2000);
   };
 
   const success = () => {
@@ -146,34 +142,10 @@ const DownloaderInput = () => {
     });
   };
 
-  const copyToChipboard = () => {
-    if (imageText) {
-      navigator.clipboard.writeText(imageText);
-    }
-  };
-
   return (
     <>
       {alertInfo.show && (
-        <div
-          role="alert"
-          className={`alert w-1/2 lg:w-1/5 mx-auto fixed top-10 left-1/2 ${alertInfo.type}`}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="stroke-current shrink-0 h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-            />
-          </svg>
-          <span>{alertInfo.msg}</span>
-        </div>
+        <CustomAlertByLazy props={...alertInfo}/>
       )}
       <div>
         <div className="mt-8 lg:w-1/2 lg:mx-auto lg:flex lg:justify-center lg:items-center lg:mt-16">
@@ -208,27 +180,11 @@ const DownloaderInput = () => {
         </div>
       </div>
 
-      <dialog id="image_text_modal" className="modal">
-        <div className="modal-box">
-          <form method="dialog">
-            <button
-              className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 text-black"
-              onClick={() => setImageText("")}
-            >
-              ✕
-            </button>
-          </form>
-          <p className="py-4 text-black">
-            {imageText ? imageText : <i>没有提取到任何内容</i>}
-          </p>
-          <button
-            className="btn btn-sm btn-circle btn-ghost absolute right-2 bottom-2 text-black"
-            onClick={copyToChipboard}
-          >
-            {Icons.OuiCopy()}
-          </button>
-        </div>
-      </dialog>
+      <ImageTextModal
+        ref={imageTextModalRef}
+        text={imageText}
+        clearText={() => setImageText("")}
+      />
     </>
   );
 };

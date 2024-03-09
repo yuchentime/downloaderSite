@@ -1,6 +1,8 @@
 import DownloaderInput from "@/components/DownloaderInput";
-import XiaohongshuPage from "@/components/XHSInstructionsPage";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { lazy } from "react";
+const XiaohongshuPageByLazy = lazy(() => import("@/components/XHSInstructionsPage"));
+const FirendLinkByLazy = lazy(() => import("@/components/FriendLink"));
 
 export default function Home() {
   return (
@@ -8,17 +10,9 @@ export default function Home() {
       <SpeedInsights />
       <div className="bg-gray-800 text-white">
         <div className="navbar w-1/2 mx-auto">
-          <div className="navbar-start">
-          </div>
+          <div className="navbar-start"></div>
           <div className="navbar-end hidden lg:flex text-sm">
-            友链：
-            <a target="_blank" href="https://answerbook.oksocool.com/" className="text-white cursor-pointer">
-              答案之书
-            </a>
-            、
-            <a target="_blank" href="https://www.itdoc666.com/" className="text-white cursor-pointer">
-              知识充电站-专业的资料分享平台
-            </a>
+            <FirendLinkByLazy />
           </div>
         </div>
         <div className="divider w-1/2 mx-auto my-0"></div>
@@ -33,7 +27,7 @@ export default function Home() {
         <DownloaderInput />
       </div>
       <div className="mt-4 lg:mt-16 border-solid border-stone-900">
-        <XiaohongshuPage />
+        <XiaohongshuPageByLazy />
       </div>
     </>
   );
