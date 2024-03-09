@@ -76,11 +76,14 @@ const DownloaderInput = () => {
     }
     setIsLoading(true);
 
+    console.log("urls: ", urls);
     const noteJson = await fetchNote(urls);
     if (!noteJson) {
       failed();
       return;
     }
+
+    console.log("noteJson: ", noteJson);
 
     if (noteJson.imageUrls && noteJson.imageUrls.length > 0) {
       setProgressInfo("正在提取图片文本...");
@@ -104,20 +107,21 @@ const DownloaderInput = () => {
 
   const fetchNote = async (urls) => {
     let noteJson = note;
-    if (!noteJson) {
-      setProgressInfo("正在抓取笔记...");
-      const noteResp = await fetch(
-        `/api/xhs/downloader?url=${JSON.stringify(urls)}`
-      );
-      if (!noteResp.ok) {
-        return null;
-      }
-      noteJson = await noteResp.json();
-      if (!noteJson) {
-        return null;
-      }
-      setNote(noteJson);
+    if (noteJson && noteJson.url === urls) {
+      return noteJson;
     }
+    setProgressInfo("正在抓取笔记...");
+    const noteResp = await fetch(
+      `/api/xhs/downloader?url=${JSON.stringify(urls)}`
+    );
+    if (!noteResp.ok) {
+      return null;
+    }
+    noteJson = await noteResp.json();
+    if (!noteJson) {
+      return null;
+    }
+    setNote(noteJson);
     return noteJson;
   };
 

@@ -15,7 +15,7 @@ export async function GET(request) {
   }
   const headers = new Headers();
   headers.append("Content-Type", "application/json");
-  return Response.json(note)
+  return Response.json(note);
 }
 
 const downloadNote = (noteUrl) => {
@@ -45,7 +45,8 @@ const downloadNote = (noteUrl) => {
             .substring($(this).text().indexOf("=") + 1)
             .toString()
             .trim();
-          resolve(formatNote(nodeData));
+          const note = formatNote(nodeData);
+          resolve({ ...note, url: noteUrl });
           return;
         }
       });
