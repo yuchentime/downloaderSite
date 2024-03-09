@@ -1,4 +1,4 @@
-import * as CommonConstants from "@/constans/CommonConstant";
+import * as urlUtil from "@/utils/url";
 import axios from "axios";
 import cheerio from "cheerio";
 
@@ -19,12 +19,7 @@ export async function GET(request) {
 }
 
 const downloadNote = (noteUrl) => {
-  let targetUrl = "";
-  if (process.env.NEXT_PUBLIC_XHS_PROXY_URL) {
-    targetUrl = process.env.NEXT_PUBLIC_XHS_PROXY_URL.replace("%s", noteUrl);
-  } else {
-    targetUrl = CommonConstants.XHS_PROXY_URL.replace("%s", noteUrl);
-  }
+  let targetUrl = urlUtil.replaceUrlWithProxy(noteUrl);
   console.log("ready to fecth: ", targetUrl);
   return new Promise((resolve, reject) => {
     axios.get(targetUrl).then((response) => {
