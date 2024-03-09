@@ -1,5 +1,5 @@
 "use client";
-import { generateRandomString } from "@/utils/helper";
+import { extractTitleFromUrl, extractUrl } from "@/utils/helper";
 import * as React from "react";
 
 const DownloaderInput = () => {
@@ -7,14 +7,18 @@ const DownloaderInput = () => {
   const [isLoading, setIsLoading] = React.useState(false);
   const [progressInfo, setProgressInfo] = React.useState("");
   const [downloadFailed, setDownloadFailed] = React.useState(false);
+  const [imageText, setImageText] = React.useState("");
+  const [note, setNote] = React.useState(null);
 
   React.useEffect(() => {
-    setTimeout(() => {
-      setDownloadFailed(false);
-    }, 2000);
+    if (!downloadFailed) {
+      setTimeout(() => {
+        setDownloadFailed(false);
+      }, 2000);
+    }
   }, [downloadFailed]);
 
-  const handleClick = async () => {
+  const handleDownload = async () => {
     if (isLoading || !targetUrls) {
       return;
     }
@@ -23,45 +27,13 @@ const DownloaderInput = () => {
       setTargetUrls("");
       return;
     }
-
     setIsLoading(true);
 
-    setTimeout(() => {
-      setIsLoading(false);
-      setDownloadFailed(true);
-    }, 30000);
-
-    setProgressInfo("正在抓取笔记...");
-    const noteResp = await fetch(
-      `/api/xhs/downloader?url=${JSON.stringify(urls)}`
-    );
-    setProgressInfo("noteResp: ", noteResp);
-    if (!noteResp.ok) {
-      setIsLoading(false);
-      setDownloadFailed(true);
-      return;
-    }
-    const noteJson = await noteResp.json();
+    const noteJson = await fetchNote(urls);
     if (!noteJson) {
-      setIsLoading(false);
-      setDownloadFailed(true);
+      failed();
       return;
     }
-
-    // let image2Text = undefined;
-    // if (noteJson.imageUrls && noteJson.imageUrls.length > 0) {
-    //   setProgressInfo("正在提取图片文本...");
-    //   const imageTextResp = await fetch("/api/xhs/imagetext", {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify(noteJson),
-    //   });
-    //   if (imageTextResp.ok) {
-    //     image2Text = await imageTextResp.json();
-    //   }
-    // }
 
     setProgressInfo("正在打包笔记...");
     const packageResp = await fetch("/api/xhs/package", {
@@ -84,34 +56,76 @@ const DownloaderInput = () => {
     downloadLink.download = zipfilename;
     downloadLink.click();
 
-    setTargetUrls("");
-    setIsLoading(false);
-    setProgressInfo("");
+    success();
   };
 
-  const extractTitleFromUrl = (str) => {
-    const pattern = /【(.*?)】/;
-    const match = str.match(pattern);
-    if (match) {
-      const originalTitle = String(match[1]);
-      return originalTitle.substring(
-        0,
-        originalTitle.lastIndexOf(" | ") !== -1
-          ? originalTitle.lastIndexOf(" | ")
-          : originalTitle.length - 1
+  const handleImageText = async () => {
+    if (isLoading || !targetUrls) {
+      return;
+    }
+    const urls = extractUrl(targetUrls);
+    if (!urls) {
+      setTargetUrls("");
+      return;
+    }
+    setIsLoading(true);
+
+    const noteJson = await fetchNote(urls);
+    if (!noteJson) {
+      failed();
+      return;
+    }
+
+    if (noteJson.imageUrls && noteJson.imageUrls.length > 0) {
+      setProgressInfo("正在提取图片文本...");
+      const imageTextResp = await fetch("/api/xhs/imagetext", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(noteJson),
+      });
+      if (imageTextResp.ok) {
+        const imageTextJson = await imageTextResp.json();
+        console.log("imageTextJson.data: ", imageTextJson.data);
+        setImageText(imageTextJson.data);
+      }
+    }
+    document.getElementById("image_text_modal").showModal();
+
+    success();
+  };
+
+  const fetchNote = async (urls) => {
+    let noteJson = note;
+    if (!noteJson) {
+      setProgressInfo("正在抓取笔记...");
+      const noteResp = await fetch(
+        `/api/xhs/downloader?url=${JSON.stringify(urls)}`
       );
+      if (!noteResp.ok) {
+        return null;
+      }
+      noteJson = await noteResp.json();
+      if (!noteJson) {
+        return null;
+      }
+      setNote(noteJson);
     }
-    return generateRandomString(15);
+    return noteJson;
   };
 
-  const extractUrl = (originUrl) => {
-    const regex = /http:\/\/xhslink\.com\/[a-zA-Z0-9]+/;
-    var matches = originUrl.match(regex);
-    if (matches && matches.length > 0) {
-      return matches[0];
-    } else {
-      return null;
-    }
+  const failed = () => {
+    setProgressInfo("");
+    setIsLoading(false);
+    setDownloadFailed(true);
+  };
+
+  const success = () => {
+    setTargetUrls("");
+    setProgressInfo("");
+    setIsLoading(false);
+    setDownloadFailed(false);
   };
 
   return (
@@ -143,16 +157,22 @@ const DownloaderInput = () => {
             value={targetUrls}
             required
             type="text"
-            placeholder="直接输入复制的笔记链接，无需格式化"
+            placeholder="输入笔记分享链接"
             className="input input-bordered input-success w-5/6 mx-auto flex  lg:w-full h-14 text-black"
             onChange={(e) => setTargetUrls(e.target.value)}
           />
           <button
             type="button"
-            onClick={handleClick}
+            onClick={handleDownload}
             className="mt-4 mx-auto flex btn btn-success lg:mt-0 lg:ml-8 lg:h-14 w-40 lg:text-xl text-white"
           >
-            {isLoading ? "下载中..." : "点击下载"}
+            点击下载
+          </button>
+          <button
+            className="btn btn-link text-pink-400"
+            onClick={handleImageText}
+          >
+            提取图片中文本
           </button>
         </div>
         <div className="w-2/5 mx-auto mt-4 h-10 flex justify-center">
@@ -161,6 +181,15 @@ const DownloaderInput = () => {
           )}
         </div>
       </div>
+
+      <dialog id="image_text_modal" className="modal">
+        <div className="modal-box">
+          <p className="py-4 text-black">{imageText}</p>
+        </div>
+        <form method="dialog" className="modal-backdrop">
+          <button>close</button>
+        </form>
+      </dialog>
     </>
   );
 };

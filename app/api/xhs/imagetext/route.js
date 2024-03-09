@@ -13,7 +13,7 @@ export async function POST(request) {
   const imageText = await readTextFromImages(note.imageUrls);
   console.log("finished to extract text from images ");
 
-  return Response.json({ imageText: imageText });
+  return Response.json({ data: imageText });
 }
 
 const readTextFromImages = async (imageUrls) => {
