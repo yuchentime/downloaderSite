@@ -1,18 +1,20 @@
-export const generateRandomString = (length) => {
-  const characters =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  let randomString = "";
+export const formateDate = (timestamp) => {
+  const date = new Date(timestamp);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const hour = String(date.getHours()).padStart(2, "0");
+  const minute = String(date.getMinutes()).padStart(2, "0");
+  const seconds = String(date.getSeconds()).padStart(2, "0");
 
-  for (let i = 0; i < length; i++) {
-    const randomIndex = Math.floor(Math.random() * characters.length);
-    randomString += characters[randomIndex];
-  }
-
-  return randomString;
+  return `${year}${month}${day}${hour}${minute}${seconds}`;
 };
 
-
 export const extractTitleFromUrl = (str) => {
+  const isMobile = String(str).endsWith("打开【小红书】App查看精彩内容！");
+  if (isMobile) {
+    return "小红书笔记-" + formateDate(Date.now());
+  }
   const pattern = /【(.*?)】/;
   const match = str.match(pattern);
   if (match) {
@@ -24,7 +26,7 @@ export const extractTitleFromUrl = (str) => {
         : originalTitle.length - 1
     );
   }
-  return generateRandomString(15);
+  return "小红书笔记-" + formateDate(Date.now());
 };
 
 export const extractUrl = (originUrl) => {
