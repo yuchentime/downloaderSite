@@ -36,13 +36,10 @@ const readTextFromImages = async (imageUrls) => {
   imageTextPromises.forEach((res) => {
     if (res["status"] === "fulfilled") {
       const result = res["value"];
-      Object.keys(result).forEach((key) => {
-        console.log("result.data: ", result.data?.text);
-      })
       const text = result.data?.text;
       texts.push(text + "\n\r\t");
     }
-  });
+  }); 
   // 组合成单个字符串
   return texts.join("\n\n");
 };
