@@ -139,6 +139,9 @@ const readTextFromImages = async (imageUrls) => {
   if (!imageUrls) {
     return null;
   }
+  const secureImageUrls = imageUrls.map((url) => {
+    return String(url).replace('http:', 'https:')
+  })
   const scheduler = createScheduler();
   // chi_tra指繁中
   const worker1 = await createWorker(["eng", "chi_sim"]);
@@ -147,7 +150,7 @@ const readTextFromImages = async (imageUrls) => {
   scheduler.addWorker(worker2);
   /** Add 10 recognition jobs */
   const imageTextPromises = await Promise.allSettled(
-    imageUrls.map((imageUrl) => scheduler.addJob("recognize", imageUrl))
+    secureImageUrls.map((imageUrl) => scheduler.addJob("recognize", imageUrl))
   );
   await scheduler.terminate(); // It also terminates all workers.
   const texts = [];
