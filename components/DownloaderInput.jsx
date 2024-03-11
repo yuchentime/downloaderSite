@@ -2,6 +2,7 @@
 import { extractTitleFromUrl, extractUrl } from "@/utils/helper";
 import * as React from "react";
 import ImageTextModal from "./ImageTextModal";
+import { createScheduler, createWorker } from "tesseract.js";
 const CustomAlertByLazy = React.lazy(() => import("./CustomAlert"));
 
 const DownloaderInput = () => {
@@ -75,17 +76,8 @@ const DownloaderInput = () => {
 
     if (noteJson.imageUrls && noteJson.imageUrls.length > 0) {
       setProgressInfo("正在提取图片文本...");
-      const imageTextResp = await fetch("/api/xhs/imagetext", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(noteJson),
-      });
-      if (imageTextResp.ok) {
-        const imageTextJson = await imageTextResp.json();
-        setImageText(imageTextJson.data);
-      }
+      const imageText = await readTextFromImages(noteJson.imageUrls);
+      setImageText(imageText);
     }
     if (imageTextModalRef?.current) {
       imageTextModalRef.current.showModal();
@@ -142,6 +134,35 @@ const DownloaderInput = () => {
     });
   };
 
+  
+const readTextFromImages = async (imageUrls) => {
+  if (!imageUrls) {
+    return null;
+  }
+  const scheduler = createScheduler();
+  // chi_tra指繁中
+  const worker1 = await createWorker(["eng", "chi_sim"]);
+  const worker2 = await createWorker(["eng", "chi_sim"]);
+  scheduler.addWorker(worker1);
+  scheduler.addWorker(worker2);
+  /** Add 10 recognition jobs */
+  const imageTextPromises = await Promise.allSettled(
+    imageUrls.map((imageUrl) => scheduler.addJob("recognize", imageUrl))
+  );
+  await scheduler.terminate(); // It also terminates all workers.
+  const texts = [];
+  imageTextPromises.forEach((res) => {
+    if (res["status"] === "fulfilled") {
+      const result = res["value"];
+      const text = result.data?.text;
+      texts.push(text + "\n\r\t");
+    }
+  }); 
+  // 组合成单个字符串
+  return texts.join("\n\n");
+};
+
+
   return (
     <>
       {alertInfo.show && (
@@ -165,12 +186,12 @@ const DownloaderInput = () => {
             >
               点击下载
             </button>
-            {/* <button
+            <button
               className="btn btn-link text-pink-400"
               onClick={handleImageText}
             >
               提取图片中文本
-            </button> */}
+            </button>
           </div>
         </div>
         <div className="w-2/5 mx-auto mt-4 h-10 flex justify-center">
