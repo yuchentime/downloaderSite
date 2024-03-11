@@ -1,8 +1,8 @@
 "use client";
 import { extractTitleFromUrl, extractUrl } from "@/utils/helper";
 import * as React from "react";
-import ImageTextModal from "./ImageTextModal";
 import { createScheduler, createWorker } from "tesseract.js";
+import ImageTextModal from "./ImageTextModal";
 const CustomAlertByLazy = React.lazy(() => import("./CustomAlert"));
 
 const DownloaderInput = () => {
@@ -139,9 +139,6 @@ const readTextFromImages = async (imageUrls) => {
   if (!imageUrls) {
     return null;
   }
-  const secureImageUrls = imageUrls.map((url) => {
-    return String(url).replace('http:', 'https:')
-  })
   const scheduler = createScheduler();
   // chi_tra指繁中
   const worker1 = await createWorker(["eng", "chi_sim"]);
@@ -150,7 +147,7 @@ const readTextFromImages = async (imageUrls) => {
   scheduler.addWorker(worker2);
   /** Add 10 recognition jobs */
   const imageTextPromises = await Promise.allSettled(
-    secureImageUrls.map((imageUrl) => scheduler.addJob("recognize", imageUrl))
+    imageUrls.map((imageUrl) => scheduler.addJob("recognize", `/api/xhs/image?url=${JSON.stringify(imageUrl?imageUrl:"")}`))
   );
   await scheduler.terminate(); // It also terminates all workers.
   const texts = [];

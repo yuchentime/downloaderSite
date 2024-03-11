@@ -39,7 +39,7 @@ const readTextFromImages = async (imageUrls) => {
       const text = result.data?.text;
       texts.push(text + "\n\r\t");
     }
-  }); 
+  });
   // 组合成单个字符串
   return texts.join("\n\n");
 };
