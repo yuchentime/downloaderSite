@@ -45,7 +45,11 @@ export async function POST(request) {
     const url = note.videoUrl;
     try {
       const resp = await axios({ url: url, responseType: "stream" });
-      const fileNameWithType = url.substring(url.lastIndexOf("/") + 1);
+      let fileNameWithType = url.substring(url.lastIndexOf("/") + 1);
+      const suffixSignIndex = fileNameWithType.lastIndexOf("_sign=");
+      if (suffixSignIndex !== -1) {
+        fileNameWithType = fileNameWithType.substring(0, suffixSignIndex);
+      }
       zip.file(fileNameWithType, resp.data);
     } catch (err) {
       console.error(err);

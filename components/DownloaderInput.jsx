@@ -24,38 +24,32 @@ const DownloaderInput = () => {
     if (isLoading || !targetUrls) {
       return;
     }
-    if (batch) {
-      const noteMetadatas = targetUrls.split("\n").map((url) => {
-        if (url) {
-          const noteUrl = extractUrl(url);
-          const title = extractTitleFromUrl(url);
-          return {noteUrl, title}
-        }
-        return null;
-      }).filter(url => url !== null)
-
-      if (!noteMetadatas || noteMetadatas.length === 0) {
-        return;
+    const noteMetadatas = targetUrls.split("\n").map((url) => {
+      if (url) {
+        const noteUrl = extractUrl(url);
+        const title = extractTitleFromUrl(url);
+        return {noteUrl, title}
       }
-      if (noteMetadatas.length > 10) {
-        notifyAlert({
-          show: true,
-          type: "alert-warning",
-          msg: "最多支持10条分享链接",
-        })
-        return
-      }
+      return null;
+    }).filter(url => url !== null)
 
-      setIsLoading(true);
-  
-      await Promise.allSettled(noteMetadatas.map(noteMetadata => download(noteMetadata.noteUrl, noteMetadata.title)))
-
-      success();
-    } else {
-      setIsLoading(true);
-      await download(targetUrls, extractTitleFromUrl(targetUrls));
-      success();
+    if (!noteMetadatas || noteMetadatas.length === 0) {
+      return;
     }
+    if (noteMetadatas.length > 10) {
+      notifyAlert({
+        show: true,
+        type: "alert-warning",
+        msg: "最多支持10条分享链接",
+      })
+      return
+    }
+
+    setIsLoading(true);
+
+    await Promise.allSettled(noteMetadatas.map(noteMetadata => download(noteMetadata.noteUrl, noteMetadata.title)))
+
+    success();
   };
 
   const download = async (noteUrl, title) => {
@@ -90,14 +84,14 @@ const DownloaderInput = () => {
     if (isLoading || !targetUrls) {
       return;
     }
-    const urls = extractUrl(targetUrls);
-    if (!urls) {
+    const url = extractUrl(targetUrls);
+    if (!url) {
       setTargetUrls("");
       return;
     }
     setIsLoading(true);
 
-    const noteJson = await fetchNote(urls);
+    const noteJson = await fetchNote(url);
     if (!noteJson) {
       failed();
       return;
