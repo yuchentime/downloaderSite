@@ -1,7 +1,9 @@
 import DownloaderInput from "@/components/DownloaderInput";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { lazy } from "react";
-const XiaohongshuPageByLazy = lazy(() => import("@/components/XHSInstructionsPage"));
+const XiaohongshuPageByLazy = lazy(() =>
+  import("@/components/XHSInstructionsPage")
+);
 const FirendLinkByLazy = lazy(() => import("@/components/FriendLink"));
 
 export default function Home() {
