@@ -17,18 +17,49 @@ const DownloaderInput = () => {
     type: "alert-warning",
     msg: "",
   });
-  const handleDownload = async () => {
+  const [batch, setBatch] = React.useState(false);
+
+
+  const handleNoteDownload = async () => {
     if (isLoading || !targetUrls) {
       return;
     }
-    const urls = extractUrl(targetUrls);
-    if (!urls) {
-      setTargetUrls("");
-      return;
-    }
-    setIsLoading(true);
+    if (batch) {
+      const noteMetadatas = targetUrls.split("\n").map((url) => {
+        if (url) {
+          const noteUrl = extractUrl(url);
+          const title = extractTitleFromUrl(url);
+          return {noteUrl, title}
+        }
+        return null;
+      }).filter(url => url !== null)
 
-    const noteJson = await fetchNote(urls);
+      if (!noteMetadatas || noteMetadatas.length === 0) {
+        return;
+      }
+      if (noteMetadatas.length > 10) {
+        notifyAlert({
+          show: true,
+          type: "alert-warning",
+          msg: "最多支持10条分享链接",
+        })
+        return
+      }
+
+      setIsLoading(true);
+  
+      await Promise.allSettled(noteMetadatas.map(noteMetadata => download(noteMetadata.noteUrl, noteMetadata.title)))
+
+      success();
+    } else {
+      setIsLoading(true);
+      await download(targetUrls, extractTitleFromUrl(targetUrls));
+      success();
+    }
+  };
+
+  const download = async (noteUrl, title) => {
+    const noteJson = await fetchNote(noteUrl);
     if (!noteJson) {
       failed();
       return;
@@ -46,16 +77,14 @@ const DownloaderInput = () => {
       failed();
       return;
     }
-    const zipfilename = extractTitleFromUrl(targetUrls);
+    const zipfilename = title;
     const blob = await packageResp.blob();
     const url = URL.createObjectURL(blob);
     const downloadLink = document.createElement("a");
     downloadLink.href = url;
     downloadLink.download = zipfilename;
     downloadLink.click();
-
-    success();
-  };
+  }
 
   const handleImageText = async () => {
     if (isLoading || !targetUrls) {
@@ -86,41 +115,33 @@ const DownloaderInput = () => {
     success();
   };
 
-  const fetchNote = async (urls) => {
+  const fetchNote = async (url) => {
     let noteJson = note;
-    if (noteJson && noteJson.url === urls) {
+    if (noteJson && noteJson.url === url) {
       return noteJson;
     }
     setProgressInfo("正在抓取笔记...");
     const noteResp = await fetch(
-      `/api/xhs/downloader?url=${JSON.stringify(urls)}`
+      `/api/xhs/downloader?url=${JSON.stringify(url)}`
     );
     if (!noteResp.ok) {
       return null;
     }
     noteJson = await noteResp.json();
-    if (!noteJson) {
-      return null;
+    if (!batch && !noteJson) {
+      setNote(noteJson);
     }
-    setNote(noteJson);
     return noteJson;
   };
 
   const failed = () => {
     setProgressInfo("");
     setIsLoading(false);
-    setAlertInfo({
+    notifyAlert({
       show: true,
       type: "alert-warning",
       msg: "下载失败, 请重试",
-    });
-    setTimeout(() => {
-      setAlertInfo({
-        show: false,
-        type: "alert-warning",
-        msg: "",
-      });
-    }, 2000);
+    })
   };
 
   const success = () => {
@@ -134,6 +155,16 @@ const DownloaderInput = () => {
     });
   };
 
+  const notifyAlert = (alertInfo) => {
+    setAlertInfo(alertInfo);
+    setTimeout(() => {
+      setAlertInfo({
+        show: false,
+        type: "alert-warning",
+        msg: "",
+      });
+    }, 2000);
+  }
   
 const readTextFromImages = async (imageUrls) => {
   if (!imageUrls) {
@@ -171,29 +202,55 @@ const readTextFromImages = async (imageUrls) => {
       )}
       <div>
         <div className="mt-8 lg:w-1/2 lg:mx-auto lg:mt-16">
-          <input
-            value={targetUrls}
-            required
-            type="text"
-            placeholder="输入笔记分享链接"
-            className="input input-bordered input-success w-5/6 mx-auto flex lg:w-full h-14 text-black"
-            onChange={(e) => setTargetUrls(e.target.value)}
-          />
+          <div className="flex justify-center items-center">
+            {
+              !batch ? 
+              <>
+                <input
+                  value={targetUrls}
+                  required
+                  type="text"
+                  placeholder="输入单个笔记的分享链接"
+                  className="input input-bordered input-success w-5/6 mx-auto flex lg:w-full h-14 text-black"
+                  onChange={(e) => setTargetUrls(e.target.value)}
+                />
+                <button className="btn btn-link text-pink-400" onClick={() => setBatch(!batch)}>
+                  切换为多笔记下载
+                </button>
+              </>:
+              <>
+                <textarea 
+                  value={targetUrls} 
+                  required
+                  placeholder="输入多个笔记的分享链接，按回车键分隔（最多支持10条分享链接）" 
+                  className="textarea textarea-bordered textarea-md w-full min-h-44 max-h-44 text-black" 
+                  onChange={(e) => setTargetUrls(e.target.value)}
+                >
+
+                </textarea>
+                <button className="btn btn-link text-pink-400" onClick={() => setBatch(!batch)}>
+                  切换为单笔记下载
+                </button>
+              </>
+            }
+          </div>
           <div className="flex justify-center mt-4 lg:ml-6 lg:mx-auto">
             <button
               type="button"
               className="btn btn-success  w-36 lg:text-lg text-white "
-              onClick={handleDownload}
+              onClick={handleNoteDownload}
             >
               打包下载笔记
             </button>
-            <button
-              type="button"
-              className="btn btn-accent  w-36 lg:text-lg text-white ml-6"
-              onClick={handleImageText}
-            >
-              提取图片文本
-            </button>
+            {!batch && 
+              <button
+                type="button"
+                className="btn btn-accent  w-36 lg:text-lg text-white ml-6"
+                onClick={handleImageText}
+              >
+                提取图片文本
+              </button>
+            }
           </div>
         </div>
         <div className="w-2/5 mx-auto mt-4 h-10 flex justify-center">
