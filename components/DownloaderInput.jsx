@@ -154,14 +154,15 @@ const readTextFromImages = async (imageUrls) => {
   imageTextPromises.forEach((res) => {
     if (res["status"] === "fulfilled") {
       const result = res["value"];
-      const text = result.data?.text;
-      texts.push(text + "\n\r\t");
+      const text = String(result.data?.text);
+      console.log('text: ', text)
+      // 按行移除text中的空格
+      texts.push(text.replace(/ /g, ""));
     }
   }); 
   // 组合成单个字符串
-  return texts.join("\n\n");
+  return texts.join("\n");
 };
-
 
   return (
     <>
@@ -169,7 +170,7 @@ const readTextFromImages = async (imageUrls) => {
         <CustomAlertByLazy props={...alertInfo}/>
       )}
       <div>
-        <div className="mt-8 lg:w-1/2 lg:mx-auto lg:flex lg:justify-center lg:items-center lg:mt-16">
+        <div className="mt-8 lg:w-1/2 lg:mx-auto lg:mt-16">
           <input
             value={targetUrls}
             required
@@ -178,19 +179,20 @@ const readTextFromImages = async (imageUrls) => {
             className="input input-bordered input-success w-5/6 mx-auto flex lg:w-full h-14 text-black"
             onChange={(e) => setTargetUrls(e.target.value)}
           />
-          <div className="flex justify-center mt-4 lg:mt-0 lg:ml-16 lg:mx-auto">
+          <div className="flex justify-center mt-4 lg:ml-6 lg:mx-auto">
             <button
               type="button"
+              className="btn btn-success  w-36 lg:text-lg text-white "
               onClick={handleDownload}
-              className="btn btn-success lg:h-14 w-40 lg:text-xl text-white "
             >
-              点击下载
+              打包下载笔记
             </button>
             <button
-              className="btn btn-link text-pink-400"
+              type="button"
+              className="btn btn-accent  w-36 lg:text-lg text-white ml-6"
               onClick={handleImageText}
             >
-              提取图片中文本
+              提取图片文本
             </button>
           </div>
         </div>
@@ -204,6 +206,7 @@ const readTextFromImages = async (imageUrls) => {
       <ImageTextModal
         ref={imageTextModalRef}
         text={imageText}
+        setText={setImageText}
         clearText={() => setImageText("")}
       />
     </>

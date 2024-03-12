@@ -1,7 +1,7 @@
 import React from "react";
 import * as Icons from "./Icons";
 
-const ImageTextModal = React.forwardRef(({ text,clearText }, ref) => {
+const ImageTextModal = React.forwardRef(({ text,setText, clearText }, ref) => {
   const [isCopied, setIsCopied] = React.useState(false);
   const copyToChipboard = () => {
     if (text) {
@@ -45,9 +45,12 @@ const ImageTextModal = React.forwardRef(({ text,clearText }, ref) => {
             </button>
           </form>
           <div className="flex-row">
-            <p className="py-5 text-black">
-              {text ? text : <i>没有提取到任何内容</i>}
-            </p>
+            <textarea
+              className="textarea textarea-bordered py-5 mt-5 text-black w-full min-h-80 overflow-auto"
+              value={text}
+              onChange={e => setText(e.target.value)}
+              placeholder="没有提取到任何内容"
+            ></textarea>
             <div className="flex justify-end w-full lg:hidden">
               <button
                 className="btn btn-sm btn-circle btn-ghost text-black"
