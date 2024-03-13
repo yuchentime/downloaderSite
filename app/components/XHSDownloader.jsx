@@ -1,11 +1,11 @@
 "use client";
-import { extractTitleFromUrl, extractUrl } from "@/utils/helper";
+import getImageTexts from "@/app/lib/getImageTexts";
+import { extractTitleFromUrl, extractUrl } from "@/app/utils/helper";
 import * as React from "react";
-import { createScheduler, createWorker } from "tesseract.js";
 import ImageTextModal from "./ImageTextModal";
 const CustomAlertByLazy = React.lazy(() => import("./CustomAlert"));
 
-const DownloaderInput = () => {
+const XHSDownloader = () => {
   const [targetUrls, setTargetUrls] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(false);
   const [progressInfo, setProgressInfo] = React.useState("");
@@ -18,7 +18,6 @@ const DownloaderInput = () => {
     msg: "",
   });
   const [batch, setBatch] = React.useState(false);
-
 
   const handleNoteDownload = async () => {
     if (isLoading || !targetUrls) {
@@ -99,7 +98,7 @@ const DownloaderInput = () => {
 
     if (noteJson.imageUrls && noteJson.imageUrls.length > 0) {
       setProgressInfo("正在提取图片文本...");
-      const imageText = await readTextFromImages(noteJson.imageUrls);
+      const imageText = await getImageTexts(noteJson.imageUrls);
       setImageText(imageText);
     }
     if (imageTextModalRef?.current) {
@@ -160,41 +159,20 @@ const DownloaderInput = () => {
     }, 2000);
   }
   
-const readTextFromImages = async (imageUrls) => {
-  if (!imageUrls) {
-    return null;
-  }
-  const scheduler = createScheduler();
-  // chi_tra指繁中
-  const worker1 = await createWorker(["eng", "chi_sim"]);
-  const worker2 = await createWorker(["eng", "chi_sim"]);
-  scheduler.addWorker(worker1);
-  scheduler.addWorker(worker2);
-  /** Add 10 recognition jobs */
-  const imageTextPromises = await Promise.allSettled(
-    imageUrls.map((imageUrl) => scheduler.addJob("recognize", `/api/xhs/image?url=${JSON.stringify(imageUrl?imageUrl:"")}`))
-  );
-  await scheduler.terminate(); // It also terminates all workers.
-  const texts = [];
-  imageTextPromises.forEach((res) => {
-    if (res["status"] === "fulfilled") {
-      const result = res["value"];
-      const text = String(result.data?.text);
-      console.log('text: ', text)
-      // 按行移除text中的空格
-      texts.push(text.replace(/ /g, ""));
-    }
-  }); 
-  // 组合成单个字符串
-  return texts.join("\n");
-};
-
   return (
     <>
       {alertInfo.show && (
         <CustomAlertByLazy props={...alertInfo}/>
       )}
       <div>
+        <div className="w-5/6 lg:w-1/2 mx-auto lg:pt-16 text-center">
+          <h1 className="lg:text-3xl font-bold tracking-tight text-white text-xl">
+            小红书笔记一键打包下载
+          </h1>
+          <p className=" text-white text-sm">
+            zip格式打包下载小红书视频、图片及文本
+          </p>
+        </div>
         <div className="mt-8 lg:w-1/2 lg:mx-auto lg:mt-16">
           <div className="flex justify-center items-center">
             {
@@ -264,4 +242,4 @@ const readTextFromImages = async (imageUrls) => {
   );
 };
 
-export default DownloaderInput;
+export default XHSDownloader;

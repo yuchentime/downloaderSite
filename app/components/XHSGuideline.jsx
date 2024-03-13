@@ -1,6 +1,6 @@
 "use client";
 
-const XiaohongshuPage = () => {
+const XHSGuideline = () => {
   return (
     <div className="lg:w-1/2 mx-auto mb-8">
       <div className="text-2xl font-bold bg-green-400 h-14 items-center flex px-4 text-white">
@@ -73,4 +73,4 @@ const XiaohongshuPage = () => {
   );
 };
 
-export default XiaohongshuPage;
+export default XHSGuideline;

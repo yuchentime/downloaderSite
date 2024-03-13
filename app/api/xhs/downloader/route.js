@@ -1,4 +1,4 @@
-import * as urlUtil from "@/utils/url";
+import * as urlUtil from "@/app/utils/url";
 import axios from "axios";
 import cheerio from "cheerio";
 
