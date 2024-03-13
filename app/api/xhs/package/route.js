@@ -1,4 +1,4 @@
-import * as CommonConstants from "@/constans/CommonConstant";
+import * as CommonConstants from "@/app/constans/CommonConstant";
 import axios from "axios";
 import JSZip from "jszip";
 
