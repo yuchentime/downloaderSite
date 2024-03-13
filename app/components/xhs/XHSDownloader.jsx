@@ -2,8 +2,8 @@
 import getImageTexts from "@/app/lib/getImageTexts";
 import { extractTitleFromUrl, extractUrl } from "@/app/utils/helper";
 import * as React from "react";
-import ImageTextModal from "./ImageTextModal";
-const CustomAlertByLazy = React.lazy(() => import("./CustomAlert"));
+import ImageTextModal from "../ImageTextModal";
+const CustomAlertByLazy = React.lazy(() => import("../CustomAlert"));
 
 const XHSDownloader = () => {
   const [targetUrls, setTargetUrls] = React.useState("");
@@ -164,16 +164,16 @@ const XHSDownloader = () => {
       {alertInfo.show && (
         <CustomAlertByLazy props={...alertInfo}/>
       )}
-      <div>
-        <div className="w-5/6 lg:w-1/2 mx-auto lg:pt-16 text-center">
+      <div className="mx-auto lg:w-1/2">
+        <div className="w-5/6 pt-4 lg:pt-16 flex-row mx-auto text-center">
           <h1 className="lg:text-3xl font-bold tracking-tight text-white text-xl">
             小红书笔记一键打包下载
           </h1>
-          <p className=" text-white text-sm">
+          <p className=" text-white text-sm text-red-500">
             zip格式打包下载小红书视频、图片及文本
           </p>
         </div>
-        <div className="mt-8 lg:w-1/2 lg:mx-auto lg:mt-16">
+        <div className="mt-8 lg:mt-16">
           <div className="flex justify-center items-center">
             {
               !batch ? 
@@ -186,9 +186,6 @@ const XHSDownloader = () => {
                   className="input input-bordered input-success w-5/6 mx-auto flex lg:w-full h-14 text-black"
                   onChange={(e) => setTargetUrls(e.target.value)}
                 />
-                <button className="btn btn-link text-pink-400" onClick={() => setBatch(!batch)}>
-                  切换为多笔记下载
-                </button>
               </>:
               <>
                 <textarea 
@@ -198,34 +195,39 @@ const XHSDownloader = () => {
                   className="textarea textarea-bordered textarea-md w-full min-h-44 max-h-44 text-black" 
                   onChange={(e) => setTargetUrls(e.target.value)}
                 >
-
                 </textarea>
-                <button className="btn btn-link text-pink-400" onClick={() => setBatch(!batch)}>
-                  切换为单笔记下载
-                </button>
               </>
             }
           </div>
-          <div className="flex justify-center mt-4 lg:ml-6 lg:mx-auto">
+          <div className="flex justify-center items-center mt-4 lg:ml-6 lg:mx-auto">
             <button
               type="button"
-              className="btn btn-success  w-36 lg:text-lg text-white "
+              className="btn btn-success w-30 lg:text-lg text-white "
               onClick={handleNoteDownload}
             >
               打包下载笔记
             </button>
-            {!batch && 
-              <button
-                type="button"
-                className="btn btn-accent  w-36 lg:text-lg text-white ml-6"
-                onClick={handleImageText}
-              >
-                提取图片文本
-              </button>
+            {!batch ? 
+              <div>
+                <button
+                  type="button"
+                  className="btn btn-accent w-30 lg:text-lg text-white ml-6"
+                  onClick={handleImageText}
+                >
+                  提取图片文本
+                </button>
+                <div className="tooltip tooltip-right" data-tip="切换为多笔记下载">
+                  <input type="checkbox" className="toggle toggle-success ml-4" onChange={() => setBatch(!batch)} />
+                </div>
+              </div> 
+              : 
+              <div className="tooltip tooltip-right" data-tip="切换为单笔记下载">
+                <input type="checkbox" className="toggle toggle-success ml-4" onChange={() => setBatch(!batch)} checked />
+              </div>
             }
           </div>
         </div>
-        <div className="w-2/5 mx-auto mt-4 h-10 flex justify-center">
+        <div className="w-2/5 mt-4 h-10 flex justify-center">
           {isLoading && (
             <div className="w-100 mx-auto h-10">{progressInfo}</div>
           )}

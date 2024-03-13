@@ -1,6 +1,6 @@
 const FirendLink = () => {
   return (
-    <>
+    <div>
       友链：
       <a
         target="_blank"
@@ -17,7 +17,7 @@ const FirendLink = () => {
       >
         知识充电站-专业的资料分享平台
       </a>
-    </>
+    </div>
   );
 };
 
