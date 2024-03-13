@@ -172,8 +172,7 @@ const readTextFromImages = async (imageUrls) => {
   scheduler.addWorker(worker2);
   /** Add 10 recognition jobs */
   const imageTextPromises = await Promise.allSettled(
-    // imageUrls.map((imageUrl) => scheduler.addJob("recognize", `/api/xhs/image?url=${JSON.stringify(imageUrl?imageUrl:"")}`))
-    imageUrls.map((imageUrl) => scheduler.addJob("recognize", imageUrl))
+    imageUrls.map((imageUrl) => scheduler.addJob("recognize", `/api/xhs/image?url=${JSON.stringify(imageUrl?imageUrl:"")}`))
   );
   await scheduler.terminate(); // It also terminates all workers.
   const texts = [];
