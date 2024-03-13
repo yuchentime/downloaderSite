@@ -1,7 +1,7 @@
-import XHSDownloader from "@/app/components/XHSDownloader";
+import XHSDownloader from "@/app/components/xhs/XHSDownloader";
 import { lazy } from "react";
 const XHSGuidelineByLazy = lazy(() =>
-  import("@/app/components/XHSGuideline")
+  import("@/app/components/xhs/XHSGuideline")
 );
 
 export default function Home() {

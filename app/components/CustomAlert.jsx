@@ -1,5 +1,6 @@
 const CustomAlert = ({ props }) => {
   const { type, msg } = props;
+  
   return (
     <>
       <div

@@ -1,6 +1,7 @@
-import { Inter } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import FirendLink from "@/app/components/FriendLink";
+import { Inter } from "next/font/google";
+import Navbar from '@/app/components/navbar/Navbar'
+const CustomAlertByLazy = React.lazy(() => import("@/app/components/CustomAlert"));
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -24,14 +25,7 @@ export default function RootLayout({ children }) {
       <body className={inter.className}>
         <div>
           <SpeedInsights />
-          <div className="bg-gray-800 text-white border-solid border-stone-900 bottom-2 shadow-xl">
-            <div className="navbar w-1/2 mx-auto">
-              <div className="navbar-start"></div>
-              <div className="navbar-end hidden lg:flex text-sm">
-                <FirendLink />
-              </div>
-            </div>
-          </div>
+          <Navbar/>
         </div>
         <div>{children}</div>
       </body>
