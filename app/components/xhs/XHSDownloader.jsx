@@ -21,14 +21,17 @@ const XHSDownloader = () => {
     if (isLoading || !targetUrls) {
       return;
     }
-    const noteMetadatas = targetUrls.split("\n").map((url) => {
-      if (url) {
-        const noteUrl = extractUrl(url);
-        const title = extractTitleFromUrl(url);
-        return {noteUrl, title}
-      }
-      return null;
-    }).filter(url => url !== null)
+    const noteMetadatas = targetUrls
+      .split("\n")
+      .map((url) => {
+        if (url) {
+          const noteUrl = extractUrl(url);
+          const title = extractTitleFromUrl(url);
+          return { noteUrl, title };
+        }
+        return null;
+      })
+      .filter((url) => url !== null);
 
     if (!noteMetadatas || noteMetadatas.length === 0) {
       return;
@@ -38,13 +41,17 @@ const XHSDownloader = () => {
         show: true,
         type: "alert-warning",
         msg: "最多支持10条分享链接",
-      })
-      return
+      });
+      return;
     }
 
     setIsLoading(true);
 
-    await Promise.allSettled(noteMetadatas.map(noteMetadata => download(noteMetadata.noteUrl, noteMetadata.title)))
+    await Promise.allSettled(
+      noteMetadatas.map((noteMetadata) =>
+        download(noteMetadata.noteUrl, noteMetadata.title)
+      )
+    );
 
     success();
   };
@@ -75,7 +82,7 @@ const XHSDownloader = () => {
     downloadLink.href = url;
     downloadLink.download = zipfilename;
     downloadLink.click();
-  }
+  };
 
   const handleImageText = async () => {
     if (isLoading || !targetUrls) {
@@ -132,7 +139,7 @@ const XHSDownloader = () => {
       show: true,
       type: "alert-warning",
       msg: "下载失败, 请重试",
-    })
+    });
   };
 
   const success = () => {
@@ -142,12 +149,12 @@ const XHSDownloader = () => {
   };
 
   const notifyAlert = (alertInfo) => {
-    notify(alertInfo)
+    notify(alertInfo);
     setTimeout(() => {
-      reset()
+      reset();
     }, 2000);
-  }
-  
+  };
+
   return (
     <>
       <div className="mx-auto lg:w-1/2">
@@ -161,8 +168,7 @@ const XHSDownloader = () => {
         </div>
         <div className="mt-8 lg:mt-16">
           <div className="flex justify-center items-center">
-            {
-              !batch ? 
+            {!batch ? (
               <>
                 <input
                   value={targetUrls}
@@ -172,18 +178,18 @@ const XHSDownloader = () => {
                   className="input input-bordered input-success w-5/6 mx-auto flex lg:w-full h-14 text-black"
                   onChange={(e) => setTargetUrls(e.target.value)}
                 />
-              </>:
-              <>
-                <textarea 
-                  value={targetUrls} 
-                  required
-                  placeholder="输入多个笔记的分享链接，按回车键分隔（最多支持10条分享链接）" 
-                  className="textarea textarea-bordered textarea-md w-full min-h-44 max-h-44 text-black" 
-                  onChange={(e) => setTargetUrls(e.target.value)}
-                >
-                </textarea>
               </>
-            }
+            ) : (
+              <>
+                <textarea
+                  value={targetUrls}
+                  required
+                  placeholder="输入多个笔记的分享链接，按回车键分隔（最多支持10条分享链接）"
+                  className="textarea textarea-bordered textarea-md w-full min-h-44 max-h-44 text-black"
+                  onChange={(e) => setTargetUrls(e.target.value)}
+                ></textarea>
+              </>
+            )}
           </div>
           <div className="flex justify-center items-center mt-4 lg:ml-6 lg:mx-auto">
             <button
@@ -193,7 +199,7 @@ const XHSDownloader = () => {
             >
               打包下载笔记
             </button>
-            {!batch ? 
+            {!batch ? (
               <div>
                 <button
                   type="button"
@@ -202,21 +208,36 @@ const XHSDownloader = () => {
                 >
                   提取图片文本
                 </button>
-                <div className="tooltip tooltip-right" data-tip="切换为多笔记下载">
-                  <input type="checkbox" className="toggle toggle-success ml-4" onChange={() => setBatch(!batch)} />
+                <div
+                  className="tooltip tooltip-right"
+                  data-tip="切换为多笔记下载"
+                >
+                  <input
+                    type="checkbox"
+                    className="toggle toggle-success ml-4"
+                    onChange={() => setBatch(!batch)}
+                  />
                 </div>
-              </div> 
-              : 
-              <div className="tooltip tooltip-right" data-tip="切换为单笔记下载">
-                <input type="checkbox" className="toggle toggle-success ml-4" onChange={() => setBatch(!batch)} checked />
               </div>
-            }
+            ) : (
+              <div
+                className="tooltip tooltip-right"
+                data-tip="切换为单笔记下载"
+              >
+                <input
+                  type="checkbox"
+                  className="toggle toggle-success ml-4"
+                  onChange={() => setBatch(!batch)}
+                  checked
+                />
+              </div>
+            )}
           </div>
-        </div>
-        <div className="w-2/5 mt-4 h-10 flex justify-center">
-          {isLoading && (
-            <div className="w-100 mx-auto h-10">{progressInfo}</div>
-          )}
+          <div className="flex justify-center items-center w-2/5 mt-4 h-10 mx-auto">
+            {isLoading && (
+              <div className="w-100 mx-auto h-10">{progressInfo}</div>
+            )}
+          </div>
         </div>
       </div>
 
