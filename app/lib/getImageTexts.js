@@ -1,10 +1,11 @@
 import { createScheduler, createWorker } from "tesseract.js";
 
+const scheduler = createScheduler();
+
 const getImageTexts = async (imageUrls) => {
   if (!imageUrls) {
     return null;
   }
-  const scheduler = createScheduler();
   // chi_tra指繁中
   const worker1 = await createWorker(["eng", "chi_sim"]);
   const worker2 = await createWorker(["eng", "chi_sim"]);

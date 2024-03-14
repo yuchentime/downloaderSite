@@ -2,8 +2,8 @@
 import getImageTexts from "@/app/lib/getImageTexts";
 import { extractTitleFromUrl, extractUrl } from "@/app/utils/helper";
 import * as React from "react";
-import ImageTextModal from "../ImageTextModal";
-const CustomAlertByLazy = React.lazy(() => import("../CustomAlert"));
+import ImageTextModal from "@/app/components/ImageTextModal";
+import { useAlertStore } from "@/app/context/store";
 
 const XHSDownloader = () => {
   const [targetUrls, setTargetUrls] = React.useState("");
@@ -12,12 +12,10 @@ const XHSDownloader = () => {
   const [imageText, setImageText] = React.useState("");
   const imageTextModalRef = React.useRef(null);
   const [note, setNote] = React.useState(null);
-  const [alertInfo, setAlertInfo] = React.useState({
-    show: false,
-    type: "alert-warning",
-    msg: "",
-  });
   const [batch, setBatch] = React.useState(false);
+
+  const notify = useAlertStore((state) => state.notify);
+  const reset = useAlertStore((state) => state.reset);
 
   const handleNoteDownload = async () => {
     if (isLoading || !targetUrls) {
@@ -141,35 +139,23 @@ const XHSDownloader = () => {
     setTargetUrls("");
     setProgressInfo("");
     setIsLoading(false);
-    setAlertInfo({
-      show: false,
-      type: "alert-warning",
-      msg: "",
-    });
   };
 
   const notifyAlert = (alertInfo) => {
-    setAlertInfo(alertInfo);
+    notify(alertInfo)
     setTimeout(() => {
-      setAlertInfo({
-        show: false,
-        type: "alert-warning",
-        msg: "",
-      });
+      reset()
     }, 2000);
   }
   
   return (
     <>
-      {alertInfo.show && (
-        <CustomAlertByLazy props={...alertInfo}/>
-      )}
       <div className="mx-auto lg:w-1/2">
         <div className="w-5/6 pt-4 lg:pt-16 flex-row mx-auto text-center">
           <h1 className="lg:text-3xl font-bold tracking-tight text-white text-xl">
             小红书笔记一键打包下载
           </h1>
-          <p className=" text-white text-sm text-red-500">
+          <p className=" text-sm text-red-500">
             zip格式打包下载小红书视频、图片及文本
           </p>
         </div>
