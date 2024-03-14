@@ -1,7 +1,7 @@
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Inter } from "next/font/google";
 import Navbar from '@/app/components/navbar/Navbar'
-const CustomAlertByLazy = React.lazy(() => import("@/app/components/CustomAlert"));
+import CustomAlert from '@/app/components/CustomAlert'
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -19,12 +19,13 @@ export default function RootLayout({ children }) {
           async
           src="https://www.googletagmanager.com/gtag/js?id=G-3WGZW7MJWK"
         ></script>
-        <script async src="../../utils/webanalytics.js"></script>
+        <script async src="@/app/utils/webanalytics.js"></script>
       </head>
 
       <body className={inter.className}>
         <div>
           <SpeedInsights />
+          <CustomAlert/>
           <Navbar/>
         </div>
         <div>{children}</div>
