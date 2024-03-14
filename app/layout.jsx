@@ -1,7 +1,8 @@
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Inter } from "next/font/google";
-import Navbar from '@/app/components/navbar/Navbar'
-import CustomAlert from '@/app/components/CustomAlert'
+import Navbar from "@/app/components/navbar/Navbar";
+import CustomAlert from "@/app/components/CustomAlert";
+import Script from "next/script";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -15,18 +16,24 @@ export default function RootLayout({ children }) {
   return (
     <html lang="cn">
       <head>
-        <script
-          async
-          src="https://www.googletagmanager.com/gtag/js?id=G-3WGZW7MJWK"
-        ></script>
-        <script async src="@/app/utils/webanalytics.js"></script>
+        <Script
+          id="clarity"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `(function(c,l,a,r,i,t,y){
+                          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+                          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+                          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+                      })(window, document, "clarity", "script", "lglphlpsb8");`,
+          }}
+        />
       </head>
 
       <body className={inter.className}>
         <div>
           <SpeedInsights />
-          <CustomAlert/>
-          <Navbar/>
+          <CustomAlert />
+          <Navbar />
         </div>
         <div>{children}</div>
       </body>
