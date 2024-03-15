@@ -1,4 +1,4 @@
-import * as urlUtil from "@/app/utils/url";
+import * as helper from "@/app/utils/helper";
 import axios from "axios";
 import cheerio from "cheerio";
 
@@ -19,7 +19,7 @@ export async function GET(request) {
 }
 
 const downloadNote = (noteUrl) => {
-  let targetUrl = urlUtil.replaceUrlWithProxy(noteUrl);
+  let targetUrl = helper.replaceUrlWithProxy(noteUrl);
   console.log("ready to fecth: ", targetUrl);
   return new Promise((resolve, reject) => {
     axios.get(targetUrl).then((response) => {

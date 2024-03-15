@@ -1,9 +1,15 @@
 "use client";
-import getImageTexts from "@/app/lib/getImageTexts";
-import { extractTitleFromUrl, extractUrl } from "@/app/utils/helper";
-import * as React from "react";
+import DownloadWildcard from "@/app/components/DownloadWildcard";
 import ImageTextModal from "@/app/components/ImageTextModal";
 import { useAlertStore } from "@/app/context/store";
+import BatchProcessor from "@/app/lib/batchprocesser";
+import { fromShareUrl } from "@/app/lib/converter";
+import getImageTexts from "@/app/lib/getImageTexts";
+import { extractUrl } from "@/app/utils/helper";
+import EventEmitter from "events";
+import * as React from "react";
+const eventEmitter = new EventEmitter();
+const batchProcessor = new BatchProcessor(10, 1000, eventEmitter);
 
 const XHSDownloader = () => {
   const [targetUrls, setTargetUrls] = React.useState("");
@@ -17,26 +23,28 @@ const XHSDownloader = () => {
   const notify = useAlertStore((state) => state.notify);
   const reset = useAlertStore((state) => state.reset);
 
+  React.useEffect(() => {
+    setTargetUrls("");
+  }, [batch]);
+
   const handleNoteDownload = async () => {
     if (isLoading || !targetUrls) {
       return;
     }
-    const noteMetadatas = targetUrls
+    const noteTasks = targetUrls
       .split("\n")
-      .map((url) => {
-        if (url) {
-          const noteUrl = extractUrl(url);
-          const title = extractTitleFromUrl(url);
-          return { noteUrl, title };
-        }
-        return null;
-      })
-      .filter((url) => url !== null);
+      .map(fromShareUrl)
+      .filter((url) => url);
 
-    if (!noteMetadatas || noteMetadatas.length === 0) {
+    if (!noteTasks || noteTasks.length === 0) {
+      notifyAlert({
+        show: true,
+        type: "alert-warning",
+        msg: "请确认分享链接是否有效",
+      });
       return;
     }
-    if (noteMetadatas.length > 10) {
+    if (noteTasks.length > 10) {
       notifyAlert({
         show: true,
         type: "alert-warning",
@@ -45,44 +53,9 @@ const XHSDownloader = () => {
       return;
     }
 
-    setIsLoading(true);
-
-    await Promise.allSettled(
-      noteMetadatas.map((noteMetadata) =>
-        download(noteMetadata.noteUrl, noteMetadata.title)
-      )
-    );
-
-    success();
+    batchProcessor.addTask(noteTasks);
   };
 
-  const download = async (noteUrl, title) => {
-    const noteJson = await fetchNote(noteUrl);
-    if (!noteJson) {
-      failed();
-      return;
-    }
-
-    setProgressInfo("正在打包笔记...");
-    const packageResp = await fetch("/api/xhs/package", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(noteJson),
-    });
-    if (!packageResp.ok) {
-      failed();
-      return;
-    }
-    const zipfilename = title;
-    const blob = await packageResp.blob();
-    const url = URL.createObjectURL(blob);
-    const downloadLink = document.createElement("a");
-    downloadLink.href = url;
-    downloadLink.download = zipfilename;
-    downloadLink.click();
-  };
 
   const handleImageText = async () => {
     if (isLoading || !targetUrls) {
@@ -240,7 +213,7 @@ const XHSDownloader = () => {
           </div>
         </div>
       </div>
-
+      <DownloadWildcard eventEmitter={eventEmitter} />
       <ImageTextModal
         ref={imageTextModalRef}
         text={imageText}

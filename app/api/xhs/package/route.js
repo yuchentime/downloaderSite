@@ -10,7 +10,6 @@ export async function POST(request) {
   if (!note) {
     return Response.error();
   }
-  console.log("ready to package, note: ", note);
   const zip = new JSZip();
   zip.file(note.title + "." + CommonConstants.TEXT_TYPE, note.desc);
 
