@@ -15,8 +15,8 @@ const DownloadWildcard = ({ eventEmitter }) => {
   };
 
   useEffect(() => {
-    eventEmitter.on("taskDownload", handleTaskDownload);
-    return () => eventEmitter.off("taskDownload", handleTaskDownload);
+    eventEmitter.on("downloadData", handleTaskDownload);
+    return () => eventEmitter.off("downloadData", handleTaskDownload);
   }, [eventEmitter]);
 
   return <></>;

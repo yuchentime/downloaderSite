@@ -26,14 +26,14 @@ class BatchProcessor {
       this.queue = this.queue.slice(this.batchSize);
 
       try {
-        this.eventEmitter.emit("downloadCompleted", {
+        this.eventEmitter.emit("downloadProgress", {
           status: "downloading",
           msg: `正在下载第${this.currentBundle}/${this.bundleSize}批数据...`,
         });
         const resultPromise = await Promise.allSettled(batch.map(handleTask));
         resultPromise.forEach((result) => {
           if (result.status === "fulfilled") {
-            this.eventEmitter.emit("taskDownload", result.value);
+            this.eventEmitter.emit("downloadData", result.value);
           }
         });
         this.currentBundle += 1;
@@ -44,7 +44,7 @@ class BatchProcessor {
       if (this.queue.length > 0) {
         await new Promise((resolve) => setTimeout(resolve, this.interval));
       } else {
-        this.eventEmitter.emit("downloadCompleted", {
+        this.eventEmitter.emit("downloadProgress", {
           status: "downloaded",
           msg: "已全部下载完成!",
         });

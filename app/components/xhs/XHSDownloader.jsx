@@ -34,8 +34,8 @@ const XHSDownloader = () => {
   };
 
   React.useEffect(() => {
-    eventEmitter.on("downloadCompleted", handleDownloadCompleted);
-    return () => eventEmitter.off("downloadCompleted", handleDownloadCompleted);
+    eventEmitter.on("downloadProgress", handleDownloadCompleted);
+    return () => eventEmitter.off("downloadProgress", handleDownloadCompleted);
   }, [eventEmitter]);
 
   React.useEffect(() => {

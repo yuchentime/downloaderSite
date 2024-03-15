@@ -33,7 +33,6 @@ const downloadNote = (noteUrl) => {
       // Select elements with Cheerio
       const $ = cheerio.load(html);
       $("script").each(function () {
-        // console.log($(this).text());
         if ($(this).text().includes("window.__INITIAL_STATE__=")) {
           const nodeData = $(this)
             .text()
