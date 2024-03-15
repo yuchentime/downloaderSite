@@ -3,7 +3,7 @@ import { useEffect } from "react";
 
 const DownloadWildcard = ({ eventEmitter }) => {
   const handleTaskDownload = (data) => {
-    console.count("Event received:", data["title"]);
+    console.info('recevied: ', data['title'])
     const blob = data["blob"];
     if (blob) {
       const url = URL.createObjectURL(blob);

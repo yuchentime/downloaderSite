@@ -8,6 +8,8 @@ import getImageTexts from "@/app/lib/getImageTexts";
 import { extractUrl } from "@/app/utils/helper";
 import EventEmitter from "events";
 import * as React from "react";
+import getNoteJson from "@/app/lib/getNoteJson";
+
 const eventEmitter = new EventEmitter();
 const batchProcessor = new BatchProcessor(10, 1000, eventEmitter);
 
@@ -17,11 +19,24 @@ const XHSDownloader = () => {
   const [progressInfo, setProgressInfo] = React.useState("");
   const [imageText, setImageText] = React.useState("");
   const imageTextModalRef = React.useRef(null);
-  const [note, setNote] = React.useState(null);
   const [batch, setBatch] = React.useState(false);
 
   const notify = useAlertStore((state) => state.notify);
   const reset = useAlertStore((state) => state.reset);
+
+  const handleDownloadCompleted = (message) => {
+    setProgressInfo(message.msg);
+    if (message.status === "downloaded") {
+      setTimeout(() => {
+        setProgressInfo("");
+      }, 2000);
+    }
+  };
+
+  React.useEffect(() => {
+    eventEmitter.on("downloadCompleted", handleDownloadCompleted);
+    return () => eventEmitter.off("downloadCompleted", handleDownloadCompleted);
+  }, [eventEmitter]);
 
   React.useEffect(() => {
     setTargetUrls("");
@@ -53,9 +68,9 @@ const XHSDownloader = () => {
       return;
     }
 
+    setIsLoading(true);
     batchProcessor.addTask(noteTasks);
   };
-
 
   const handleImageText = async () => {
     if (isLoading || !targetUrls) {
@@ -68,7 +83,7 @@ const XHSDownloader = () => {
     }
     setIsLoading(true);
 
-    const noteJson = await fetchNote(url);
+    const noteJson = await getNoteJson(url);
     if (!noteJson) {
       failed();
       return;
@@ -84,25 +99,6 @@ const XHSDownloader = () => {
     }
 
     success();
-  };
-
-  const fetchNote = async (url) => {
-    let noteJson = note;
-    if (noteJson && noteJson.url === url) {
-      return noteJson;
-    }
-    setProgressInfo("正在抓取笔记...");
-    const noteResp = await fetch(
-      `/api/xhs/downloader?url=${JSON.stringify(url)}`
-    );
-    if (!noteResp.ok) {
-      return null;
-    }
-    noteJson = await noteResp.json();
-    if (!batch && !noteJson) {
-      setNote(noteJson);
-    }
-    return noteJson;
   };
 
   const failed = () => {
