@@ -30,13 +30,18 @@ export const extractTitleFromUrl = (str) => {
 };
 
 export const extractUrl = (originUrl) => {
-  const regex = /http:\/\/xhslink\.com\/[a-zA-Z0-9]+/;
-  var matches = originUrl.match(regex);
+  const sharedRegex = /http:\/\/xhslink\.com\/[a-zA-Z0-9]+/;
+  let matches = originUrl.match(sharedRegex);
   if (matches && matches.length > 0) {
     return matches[0];
-  } else {
-    return null;
   }
+  const realRegex = /https:\/\/www\.xiaohongshu\.com\/explore\/[a-zA-Z0-9]+/;
+  matches = originUrl.match(realRegex);
+  if (matches && matches.length > 0) {
+    return matches[0];
+  }
+
+  return null;
 };
 
 export const replaceUrlWithProxy = (url) => {

@@ -19,7 +19,18 @@ export async function POST(request) {
       note.imageUrls.map((url) => {
         return new Promise((resolve, reject) => {
           try {
-            axios({ url: url, responseType: "stream" }).then((resp) => {
+            axios({
+              url: url,
+              headers: {
+                "User-Agent":
+                  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
+                Accept:
+                  "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+                "Accept-Encoding": "gzip, deflate, br",
+                "Accept-Language": "en-US,en;q=0.5",
+              },
+              responseType: "stream",
+            }).then((resp) => {
               resolve({ url: url, data: resp.data });
             });
           } catch (err) {
