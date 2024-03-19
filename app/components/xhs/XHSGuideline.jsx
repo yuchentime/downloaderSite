@@ -28,12 +28,6 @@ const XHSGuideline = () => {
                     5. 点击下载
                   </>
                 </p>
-                <img
-                  src="https://yczeh123-oss.oss-cn-hangzhou.aliyuncs.com/xhs_share_url.png"
-                  alt="小红书"
-                  width={300}
-                  height={300}
-                />
               </div>
             </div>
           </div>
@@ -58,12 +52,6 @@ const XHSGuideline = () => {
                     5. 点击下载
                   </>
                 </p>
-                <img
-                  src="https://yczeh123-oss.oss-cn-hangzhou.aliyuncs.com/phone_share_url.jpg"
-                  alt="小红书"
-                  width={300}
-                  height={200}
-                />
               </div>
             </div>
           </div>
