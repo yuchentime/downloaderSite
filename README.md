@@ -8,5 +8,8 @@
 -api/xhs/image: 图片资源路由转发
 
 -lib（笔记处理相关工具类）
- . batcheprocesser: 批处理笔记打包下载
+ 
+ batcheprocesser: 批处理笔记打包下载
+
+-component/xhs/XHSDownloader.jsx: 入口
   
