@@ -12,6 +12,8 @@ class BatchProcessor {
   }
 
   addTask(tasks) {
+// todo 任务数限制
+
     this.queue.push(...tasks);
     this.bundleSize = Math.ceil(this.queue.length / this.batchSize);
     this.startProcessing();

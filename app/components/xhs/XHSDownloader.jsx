@@ -59,14 +59,14 @@ const XHSDownloader = () => {
       });
       return;
     }
-    if (noteTasks.length > 10) {
-      notifyAlert({
-        show: true,
-        type: "alert-warning",
-        msg: "最多支持10条分享链接",
-      });
-      return;
-    }
+    // if (noteTasks.length > 10) {
+    //   notifyAlert({
+    //     show: true,
+    //     type: "alert-warning",
+    //     msg: "最多支持10条分享链接",
+    //   });
+    //   return;
+    // }
 
     setIsLoading(true);
     batchProcessor.addTask(noteTasks);
