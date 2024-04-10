@@ -42,6 +42,10 @@ const XHSDownloader = () => {
     setTargetUrls("");
   }, [batch]);
 
+  const handleBatchDownload = async () => {
+    const noteResp = await fetch("/api/xhs/batch");
+  };
+
   const handleNoteDownload = async () => {
     if (isLoading || !targetUrls) {
       return;
@@ -127,6 +131,13 @@ const XHSDownloader = () => {
   return (
     <>
       <div className="mx-auto lg:w-1/2">
+        <button
+          type="button"
+          className="btn btn-success w-30 lg:text-lg text-white "
+          onClick={handleBatchDownload}
+        >
+          批量下载笔记
+        </button>
         <div className="w-5/6 pt-4 lg:pt-16 flex-row mx-auto text-center">
           <h1 className="lg:text-3xl font-bold tracking-tight text-white text-xl">
             小红书笔记一键打包下载
