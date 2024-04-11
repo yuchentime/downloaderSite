@@ -12,7 +12,7 @@ const XHSDownloader = () => {
   const [imageText, setImageText] = React.useState("");
   const imageTextModalRef = React.useRef(null);
   const [note, setNote] = React.useState(null);
-  const [batch, setBatch] = React.useState(false);
+  const [batch, setBatch] = React.useState(true);
 
   const notify = useAlertStore((state) => state.notify);
   const reset = useAlertStore((state) => state.reset);
@@ -25,7 +25,7 @@ const XHSDownloader = () => {
       .split("\n")
       .map((url) => {
         if (url) {
-          const noteUrl = extractUrl(url);
+          const noteUrl = url;
           const title = extractTitleFromUrl(url);
           return { noteUrl, title };
         }
@@ -36,11 +36,11 @@ const XHSDownloader = () => {
     if (!noteMetadatas || noteMetadatas.length === 0) {
       return;
     }
-    if (noteMetadatas.length > 10) {
+    if (noteMetadatas.length > 5) {
       notifyAlert({
         show: true,
         type: "alert-warning",
-        msg: "最多支持10条分享链接",
+        msg: "最多支持5条分享链接",
       });
       return;
     }
@@ -168,28 +168,13 @@ const XHSDownloader = () => {
         </div>
         <div className="mt-8 lg:mt-16">
           <div className="flex justify-center items-center">
-            {!batch ? (
-              <>
-                <input
-                  value={targetUrls}
-                  required
-                  type="text"
-                  placeholder="输入单个笔记的分享链接"
-                  className="input input-bordered input-success w-5/6 mx-auto flex lg:w-full h-14 text-black"
-                  onChange={(e) => setTargetUrls(e.target.value)}
-                />
-              </>
-            ) : (
-              <>
-                <textarea
-                  value={targetUrls}
-                  required
-                  placeholder="输入多个笔记的分享链接，按回车键分隔（最多支持10条分享链接）"
-                  className="textarea textarea-bordered textarea-md w-full min-h-44 max-h-44 text-black"
-                  onChange={(e) => setTargetUrls(e.target.value)}
-                ></textarea>
-              </>
-            )}
+            <textarea
+              value={targetUrls}
+              required
+              placeholder="输入多个笔记的分享链接，按回车键分隔（最多支持5条分享链接）"
+              className="textarea textarea-bordered textarea-md w-full min-h-44 max-h-44 text-black"
+              onChange={(e) => setTargetUrls(e.target.value)}
+            ></textarea>
           </div>
           <div className="flex justify-center items-center mt-4 lg:ml-6 lg:mx-auto">
             <button
@@ -199,39 +184,6 @@ const XHSDownloader = () => {
             >
               打包下载笔记
             </button>
-            {!batch ? (
-              <div>
-                <button
-                  type="button"
-                  className="btn btn-accent w-30 lg:text-lg text-white ml-6"
-                  onClick={handleImageText}
-                >
-                  提取图片文本
-                </button>
-                <div
-                  className="tooltip tooltip-right"
-                  data-tip="切换为多笔记下载"
-                >
-                  <input
-                    type="checkbox"
-                    className="toggle toggle-success ml-4"
-                    onChange={() => setBatch(!batch)}
-                  />
-                </div>
-              </div>
-            ) : (
-              <div
-                className="tooltip tooltip-right"
-                data-tip="切换为单笔记下载"
-              >
-                <input
-                  type="checkbox"
-                  className="toggle toggle-success ml-4"
-                  onChange={() => setBatch(!batch)}
-                  checked
-                />
-              </div>
-            )}
           </div>
           <div className="flex justify-center items-center w-2/5 mt-4 h-10 mx-auto">
             {isLoading && (
